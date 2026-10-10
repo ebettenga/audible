@@ -209,23 +209,6 @@ function formationCards(ctx?: CardContext): FlashCard[] {
       hideTitle: true,
       resolveOptions: { includeDefense: false },
     });
-    const strength = f.strength ?? 'right';
-    cards.push({
-      id: `formation-strength-${f.id}`,
-      topic: 'formations',
-      type: 'name-formation',
-      prompt: `What is the declared strength of ${f.name}?`,
-      answer: strength === 'balanced' ? 'Balanced' : strength === 'left' ? 'Left' : 'Right',
-      distractors: pickDistractors(
-        strength === 'balanced' ? 'Balanced' : strength === 'left' ? 'Left' : 'Right',
-        ['Right', 'Left', 'Balanced'],
-      ),
-      scene,
-      explain: `${f.name} is authored ${strength}${f.description ? ` — ${f.description}` : '.'}`,
-      group: f.id,
-      hideTitle: true,
-      resolveOptions: { includeDefense: false },
-    });
   }
   return cards;
 }

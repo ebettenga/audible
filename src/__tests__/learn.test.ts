@@ -14,6 +14,7 @@ import { buildQuiz, quizXp } from '@/src/training/quiz';
 import type { CardProgress, Playbook, StudySession } from '@/src/training/types';
 import { cardsFromPlaybook, generateCards, playsForScope } from '@/src/training/cards';
 import { startOfWeek } from '@/src/training/storageSeed';
+import { FORMATIONS } from '@/src/data/formations';
 
 function fakeBook(): Playbook {
   const now = new Date().toISOString();
@@ -233,6 +234,25 @@ describe('playbook / collection modules', () => {
 });
 
 describe('quiz builder', () => {
+  it('builds one validated identification question per formation', () => {
+    const cards = generateCards('formations');
+    const names = new Set(FORMATIONS.map((formation) => formation.name));
+
+    expect(cards).toHaveLength(FORMATIONS.length);
+    expect(cards.some((card) => card.id.startsWith('formation-strength-'))).toBe(false);
+
+    for (const formation of FORMATIONS) {
+      const card = cards.find((candidate) => candidate.id === `formation-${formation.id}`);
+      expect(card).toBeDefined();
+      expect(card?.prompt).toBe('Name this formation');
+      expect(card?.answer).toBe(formation.name);
+      expect(card?.scene?.players).toHaveLength(11);
+      expect(card?.distractors).toHaveLength(3);
+      expect(card?.distractors.every((answer) => names.has(answer))).toBe(true);
+      expect(card?.distractors).not.toContain(formation.name);
+    }
+  });
+
   it('builds n questions with choices', () => {
     const quiz = buildQuiz(['formations'], 4, {}, { seed: 'test-seed' });
     expect(quiz.length).toBeLessThanOrEqual(4);
