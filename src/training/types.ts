@@ -214,7 +214,7 @@ export const TOPIC_META: Record<
 > = {
   personnel: {
     title: 'Personnel',
-    description: 'Master grouping codes and skill-player labels.',
+    description: 'Codes, the box, and why 11 / 12 / 21 / 13 change a defense.',
     color: '#c9f25b',
     tone: 'lime',
     icon: 'users',
@@ -238,7 +238,7 @@ export const TOPIC_META: Record<
   },
   'running-routes': {
     title: 'Running Routes',
-    description: 'Learn gaps, tracks, and blocking paths.',
+    description: 'Man, zone, and gap runs — and the reads that go with them.',
     color: '#dc79ad',
     tone: 'pink',
     icon: 'arrow',
@@ -246,7 +246,7 @@ export const TOPIC_META: Record<
   },
   'passing-routes': {
     title: 'Passing Routes',
-    description: 'Read the route tree and core concepts.',
+    description: 'Mesh, flood, smash, four verts, and the rest of the concept tree.',
     color: '#ae8ee8',
     tone: 'purple',
     icon: 'spark',
@@ -262,7 +262,7 @@ export const TOPIC_META: Record<
   },
   coverages: {
     title: 'Coverages',
-    description: 'Recognize shells and post-snap rotations.',
+    description: 'Cover 0 through 6, Tampa 2, and the buzz / cloud disguises.',
     color: '#6bd6cf',
     tone: 'cyan',
     icon: 'grid',
@@ -278,7 +278,7 @@ export const TOPIC_META: Record<
   },
   fronts: {
     title: 'Fronts',
-    description: 'Identify fronts, shifts, and personnel packages.',
+    description: '6-2 through dime — who is on the field and why.',
     color: '#73baf2',
     tone: 'blue',
     icon: 'layers',
@@ -286,7 +286,7 @@ export const TOPIC_META: Record<
   },
   pressures: {
     title: 'Pressures',
-    description: 'Name blitzes, dogs, and stunts.',
+    description: 'Simulated pressure, dogs, fire zones, stunts, and protection.',
     color: '#f0a55d',
     tone: 'orange',
     icon: 'arrow',

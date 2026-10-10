@@ -17,11 +17,11 @@ describe('transcript-backed quiz facts', () => {
   it('covers every Fourth and Film Learn topic with unique, well-formed facts', () => {
     const ids = QUIZ_FACTS.map((fact) => fact.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(60);
+    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(130);
 
     for (const topic of FACT_TOPICS) {
       const facts = factsForTopic(topic);
-      expect(facts.length).toBeGreaterThanOrEqual(8);
+      expect(facts.length).toBeGreaterThanOrEqual(16);
       const answers = facts.map((fact) => fact.answer.toLowerCase());
       expect(new Set(answers).size).toBe(answers.length);
     }
@@ -57,6 +57,93 @@ describe('transcript-backed quiz facts', () => {
 
     expect(cards.filter((card) => card.id.startsWith('fact-'))).toHaveLength(facts.length);
     expect(cards.length).toBe(FORMATIONS.length + facts.length);
+  });
+
+  it('covers the named concepts from each Fourth and Film transcript', () => {
+    const groups = Object.fromEntries(
+      FACT_TOPICS.map((topic) => [topic, new Set(factsForTopic(topic).map((fact) => fact.group))]),
+    ) as Record<TrainingTopic, Set<string | undefined>>;
+
+    expect([...groups.formations]).toEqual(
+      expect.arrayContaining([
+        't-formation',
+        'i-formation',
+        'ace',
+        'pro-set',
+        'shotgun',
+        'pistol',
+        'spread',
+        'wildcat',
+        'empty',
+        'jumbo',
+      ]),
+    );
+    expect([...groups.personnel]).toEqual(
+      expect.arrayContaining(['code', 'box', '11', '12', '21', '13', '10', '22']),
+    );
+    expect([...groups['passing-routes']]).toEqual(
+      expect.arrayContaining([
+        'mesh',
+        'levels',
+        'flood',
+        'smash',
+        'y-cross',
+        'four-verticals',
+        'stick',
+        'drive',
+        'dagger',
+        'slant-flat',
+        'china',
+        'shallow-cross',
+      ]),
+    );
+    expect([...groups['running-routes']]).toEqual(
+      expect.arrayContaining([
+        'lead-dive',
+        'iso',
+        'split-zone',
+        'power',
+        'counter',
+        'duo',
+        'trap',
+        'wham',
+        'g-lead',
+        't-lead',
+        'dart',
+        'speed-option',
+        'jet-zone',
+      ]),
+    );
+    expect([...groups.fronts]).toEqual(
+      expect.arrayContaining(['6-2', '5-3', '52-eagle', '4-4', '3-4', '4-3', 'bear', 'nickel', 'dime']),
+    );
+    expect([...groups.coverages]).toEqual(
+      expect.arrayContaining([
+        'cover-0',
+        'cover-1',
+        'cover-1-robber',
+        'cover-2',
+        'cover-2-man',
+        'cover-2-buzz',
+        'tampa-2',
+        'cover-3',
+        'cover-3-cloud',
+        'cover-3-buzz',
+        'cover-4',
+        'cover-6',
+      ]),
+    );
+    expect([...groups.pressures]).toEqual(
+      expect.arrayContaining([
+        'simulated',
+        'second-level',
+        'protection',
+        'perimeter',
+        'fire-zone',
+        'stunt',
+        'zero',
+      ]),
+    );
   });
 
   it('merges fact cards into each transcript topic bank', () => {
