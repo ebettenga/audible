@@ -368,6 +368,11 @@ export function QuizSession({
               showYardNumbers={false}
               showHashes
               interactive={false}
+              selectedPlayerId={
+                question.card.highlightPlayerId ??
+                scene.players.find((p) => p.highlight)?.id ??
+                null
+              }
             />
           </View>
           {Platform.OS === 'web' && wide ? (

@@ -957,9 +957,7 @@ function defenderAssignmentCards(): FlashCard[] {
         scene = buildDefense(`4-3 ${c.name}`, {
           vsPlaycall: 'Gun Doubles Right 62 Slant-Flat',
         });
-        const player = scene.players.find((p) => p.slot === slot && p.side === 'def');
-        if (player) player.highlight = true;
-        scene = { ...scene, title: '', arrows: [] };
+        scene = { ...scene, title: '' };
       } catch {
         scene = undefined;
       }
@@ -979,7 +977,7 @@ function defenderAssignmentCards(): FlashCard[] {
         explain,
         group: c.id,
         hideTitle: true,
-        highlightPlayerId: scene?.players.find((p) => p.slot === slot && p.side === 'def')?.id,
+        highlightPlayerId: `def-${slot}`,
         resolveOptions: { coverageId: c.id, frontId: '4-3', includeDefense: true },
       });
     }
@@ -1126,15 +1124,72 @@ function fieldPositionCards(): FlashCard[] {
   ];
 }
 
-export function getCardScene(card: FlashCard) {
-  if (card.scene) return card.scene;
-  const zoneId = card.highlightZoneId ?? card.resolveOptions?.highlightZoneId;
-  if (card.topic === 'zones' && zoneId) {
-    const coverageId = card.resolveOptions?.coverageId ?? coverageIdForZone(zoneId);
-    const highlighted = sceneForZoneHighlight(zoneId, coverageId);
-    if (highlighted) return highlighted;
+/** Strip ghost offense and unrelated arrows so pressure drills read at a glance. */
+function sceneForPressureLearn(scene: PlayScene): PlayScene {
+  const players = scene.players.filter((p) => !p.id.startsWith('ghost-'));
+  const arrows = scene.arrows
+    .filter((a) => !a.id.startsWith('ghost-'))
+    .filter((a) => a.id.startsWith('def-rush') || a.id.startsWith('def-blitz'))
+    .map((a) => ({ ...a, highlight: true }));
+  return {
+    ...scene,
+    title: '',
+    players,
+    arrows,
+    zones: [],
+    annotations: [],
+  };
+}
+
+/** One highlighted defender, one assignment arrow, no ghost offense or zone shell. */
+function sceneForDefenderAssignmentLearn(scene: PlayScene, focusPlayerId?: string): PlayScene {
+  const focusId =
+    focusPlayerId ??
+    scene.players.find((p) => p.side === 'def' && p.highlight)?.id;
+  const players = scene.players
+    .filter((p) => !p.id.startsWith('ghost-'))
+    .map((p) => ({
+      ...p,
+      highlight: focusId ? p.id === focusId : !!p.highlight,
+    }));
+  const arrows =
+    focusId == null
+      ? []
+      : scene.arrows
+          .filter((a) => !a.id.startsWith('ghost-') && a.playerId === focusId)
+          .map((a) => ({ ...a, highlight: true }));
+  return {
+    ...scene,
+    title: '',
+    players,
+    arrows,
+    zones: [],
+    annotations: [],
+    gapLabels: [],
+  };
+}
+
+function finishLearnScene(card: FlashCard, scene: PlayScene): PlayScene {
+  switch (card.topic) {
+    case 'pressures':
+      return sceneForPressureLearn(scene);
+    case 'defender-assignments':
+      return sceneForDefenderAssignmentLearn(scene, card.highlightPlayerId);
+    default:
+      return scene;
   }
-  if (card.playcall) {
+}
+
+export function getCardScene(card: FlashCard) {
+  let scene: PlayScene | undefined = card.scene;
+  if (!scene) {
+    const zoneId = card.highlightZoneId ?? card.resolveOptions?.highlightZoneId;
+    if (card.topic === 'zones' && zoneId) {
+      const coverageId = card.resolveOptions?.coverageId ?? coverageIdForZone(zoneId);
+      scene = sceneForZoneHighlight(zoneId, coverageId);
+    }
+  }
+  if (!scene && card.playcall) {
     const isDefenseTopic =
       card.topic === 'fronts' ||
       card.topic === 'pressures' ||
@@ -1143,24 +1198,26 @@ export function getCardScene(card: FlashCard) {
       card.topic === 'zones';
     try {
       if (isDefenseTopic) {
-        const scene = buildDefense(card.playcall, {
+        const built = buildDefense(card.playcall, {
           vsPlaycall: 'Gun Doubles Right 62 Slant-Flat',
         });
         if (card.topic === 'coverage-reads') {
-          return { ...scene, title: '', arrows: [], annotations: [] };
+          scene = { ...built, title: '', arrows: [], annotations: [] };
+        } else {
+          scene = built;
         }
-        return scene;
+      } else {
+        scene = buildPlay(card.playcall, {
+          includeDefense: card.resolveOptions?.includeDefense ?? false,
+          coverageId: card.resolveOptions?.coverageId,
+          frontId: card.resolveOptions?.frontId,
+        });
       }
-      return buildPlay(card.playcall, {
-        includeDefense: card.resolveOptions?.includeDefense ?? false,
-        coverageId: card.resolveOptions?.coverageId,
-        frontId: card.resolveOptions?.frontId,
-      });
     } catch {
       /* fall through */
     }
   }
-  return fallbackSceneForTopic(card.topic);
+  return finishLearnScene(card, scene ?? fallbackSceneForTopic(card.topic));
 }
 
 /**
