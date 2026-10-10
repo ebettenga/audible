@@ -2,7 +2,11 @@ import type { PlayCallAst } from './ast';
 import { PlaycallError } from './errors';
 import { parsePlaycall } from './tokenize';
 import { gapX, mirrorX, type Strength } from '@/src/core/field';
-import { scaleRouteToDepth } from '@/src/core/routeMath';
+import {
+  absolutePathPoints,
+  absoluteRoutePoints,
+  scaleRouteToDepth,
+} from '@/src/core/routeMath';
 import {
   colorKeyForPosition,
   type Player,
@@ -25,7 +29,7 @@ import { CONCEPTS } from '@/src/data/concepts';
 import { MOTIONS, motionPath } from '@/src/data/motions';
 
 /** Where the motion player is at the snap, and the strength his route mirrors to. */
-interface MotionOrigin {
+export interface MotionOrigin {
   slot: string;
   x: number;
   y: number;
@@ -46,18 +50,6 @@ export interface ResolveOptions {
   includeDefense?: boolean;
   /** Per-slot route overrides (builder inspector) */
   assignments?: Record<string, AssignmentOverride>;
-}
-
-function absolutePath(
-  startX: number,
-  startY: number,
-  waypoints: { x: number; y: number }[],
-  strength: Strength,
-): { x: number; y: number }[] {
-  return waypoints.map((wp) => ({
-    x: startX + mirrorX(wp.x, strength),
-    y: startY + wp.y,
-  }));
 }
 
 function playersFromFormation(
@@ -121,14 +113,37 @@ function originFor(
   return { x: player.x, y: player.y, strength };
 }
 
-/**
- * Routes are authored for a receiver right of the ball (+x = toward his sideline),
- * so mirror by the side he is on; players over the ball follow the call's strength.
- */
-function sideOfBall(x: number, strength: Strength): Strength {
-  if (x > 0.5) return 'right';
-  if (x < -0.5) return 'left';
-  return strength;
+export function motionOriginForSnap(
+  players: Player[],
+  motion: { slot: string; motionId: string } | undefined,
+  callStrength: Strength,
+): MotionOrigin | undefined {
+  if (!motion) return undefined;
+  const mover = findPlayerBySlot(players, motion.slot);
+  const def = MOTIONS.find((m) => m.id === motion.motionId);
+  const points = mover
+    ? motionPath(motion.motionId, mover, callStrength === 'left' ? -1 : 1)
+    : null;
+  if (!mover || !def || !points) return undefined;
+  const snap = points[points.length - 1];
+  const crossed = Math.sign(snap.x) !== 0 && Math.sign(snap.x) === -Math.sign(mover.x);
+  return {
+    slot: motion.slot,
+    x: snap.x,
+    y: snap.y,
+    strength: crossed ? (callStrength === 'left' ? 'right' : 'left') : callStrength,
+  };
+}
+
+/** Same geometry as post-snap routes on the main field (origin, motion, mirroring). */
+export function buildRoutePointsForPlayer(
+  player: Player,
+  relativeWaypoints: { x: number; y: number }[],
+  callStrength: Strength,
+  motion?: MotionOrigin,
+): { x: number; y: number }[] {
+  const origin = originFor(player, callStrength, motion);
+  return absoluteRoutePoints(origin.x, origin.y, relativeWaypoints, origin.strength);
 }
 
 function pushRouteArrow(
@@ -150,11 +165,10 @@ function pushRouteArrow(
     depth != null ? scaleRouteToDepth(route, depth) : route.waypoints;
   removeRouteArrow(arrows, player.id);
   covered.add(slot);
-  const origin = originFor(player, strength, motion);
   arrows.push({
     id: `${idPrefix}-${slot}-${route.id}`,
     playerId: player.id,
-    points: absolutePath(origin.x, origin.y, waypoints, sideOfBall(origin.x, origin.strength)),
+    points: buildRoutePointsForPlayer(player, waypoints, strength, motion),
     curve: route.curve,
     arrowhead: route.arrowhead,
     color: '#e8f64a',
@@ -177,22 +191,14 @@ export function resolvePlay(ast: PlayCallAst, options: ResolveOptions = {}): Pla
   const covered = new Set<string>();
 
   // --- Pre-snap motion ---
-  let motion: MotionOrigin | undefined;
-  if (ast.motion) {
+  const motion = motionOriginForSnap(players, ast.motion, strength);
+  if (ast.motion && motion) {
     const mover = findPlayerBySlot(players, ast.motion.slot);
     const def = MOTIONS.find((m) => m.id === ast.motion!.motionId);
     const points = mover
       ? motionPath(ast.motion.motionId, mover, strength === 'left' ? -1 : 1)
       : null;
     if (mover && def && points) {
-      const snap = points[points.length - 1];
-      const crossed = Math.sign(snap.x) !== 0 && Math.sign(snap.x) === -Math.sign(mover.x);
-      motion = {
-        slot: ast.motion.slot,
-        x: snap.x,
-        y: snap.y,
-        strength: crossed ? (strength === 'left' ? 'right' : 'left') : strength,
-      };
       arrows.push({
         id: `motion-${ast.motion.slot}-${def.id}`,
         playerId: mover.id,
@@ -261,7 +267,7 @@ export function resolvePlay(ast: PlayCallAst, options: ResolveOptions = {}): Pla
         arrows.push({
           id: `assign-${slot}-${opt.id.replace(':', '-')}`,
           playerId: back.id,
-          points: absolutePath(origin.x, origin.y, opt.path, origin.strength),
+          points: absolutePathPoints(origin.x, origin.y, opt.path, origin.strength),
           curve: 'rounded',
           arrowhead: 'block',
           color: '#e8f64a',
@@ -294,7 +300,7 @@ export function resolvePlay(ast: PlayCallAst, options: ResolveOptions = {}): Pla
         arrows.push({
           id: `run-rb-${run.id}`,
           playerId: rb.id,
-          points: absolutePath(origin.x, origin.y, run.ballCarrierPath, origin.strength),
+          points: absolutePathPoints(origin.x, origin.y, run.ballCarrierPath, origin.strength),
           curve: 'rounded',
           arrowhead: 'arrow',
           color: '#e8f64a',
@@ -306,7 +312,7 @@ export function resolvePlay(ast: PlayCallAst, options: ResolveOptions = {}): Pla
         arrows.push({
           id: `run-fb-${run.id}`,
           playerId: fb.id,
-          points: absolutePath(origin.x, origin.y, run.leadPath, origin.strength),
+          points: absolutePathPoints(origin.x, origin.y, run.leadPath, origin.strength),
           curve: 'rounded',
           arrowhead: run.leadArrowhead ?? 'block',
           color: '#e8f64a',
@@ -339,7 +345,7 @@ export function resolvePlay(ast: PlayCallAst, options: ResolveOptions = {}): Pla
       arrows.push({
         id: `${prefix}-${la.slot}`,
         playerId: ol.id,
-        points: absolutePath(ol.x, ol.y, opt?.path ?? la.path, strength),
+        points: absolutePathPoints(ol.x, ol.y, opt?.path ?? la.path, strength),
         curve: 'rounded',
         arrowhead: 'block',
         color: '#9ab0c8',

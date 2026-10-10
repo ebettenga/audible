@@ -1,12 +1,16 @@
 import React, { useMemo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { NO_ROUTE_ID } from '@/src/core/parser';
+import {
+  NO_ROUTE_ID,
+  buildRoutePointsForPlayer,
+  motionOriginForSnap,
+} from '@/src/core/parser';
 import { Eyebrow, SegmentedOptions, Slider, Button, isOptionActive } from '@/src/ui';
 import { FieldCanvas } from '@/src/render';
 import { colors, typography } from '@/src/design';
 import { findRouteByName, ROUTES } from '@/src/data/routes';
 import { MOTIONS } from '@/src/data/motions';
-import { scaleRouteToDepth } from '@/src/core/routeMath';
+import { absolutePathPoints, scaleRouteToDepth } from '@/src/core/routeMath';
 import { LINE_OPTIONS, BACK_OPTIONS, DEFENDER_OPTIONS } from '@/src/data/lineBlocking';
 import type { PlayScene } from '@/src/core/schema';
 import { SLOT_TO_TAG_ROLE } from './composePlaycall';
@@ -67,28 +71,47 @@ export function Inspector({
     if (!hasRoute) {
       return {
         title: '',
-        players: [{ ...player, x: 0, y: 0, highlight: true }],
+        players: [{ ...player, highlight: true }],
         arrows: [],
         zones: [],
         annotations: [],
         gapLabels: [],
       };
     }
-    const depth = builder.draftDepth || route?.defaultDepth || 8;
-    const waypoints = blockOpt
+    const callStrength = builder.strength;
+    const offensePlayers = builder.scene.players.filter((p) => p.side === 'off');
+    const motionOrigin =
+      player.side === 'off'
+        ? motionOriginForSnap(offensePlayers, builder.motion, callStrength)
+        : undefined;
+    const depth = builder.choiceUsesDepth ? builder.draftDepth : undefined;
+    const relative = blockOpt
       ? blockOpt.path
-      : route ? scaleRouteToDepth(route, depth) : [
-      { x: 0, y: 0 },
-      { x: 0, y: depth },
-    ];
+      : route
+        ? depth != null
+          ? scaleRouteToDepth(route, depth)
+          : route.waypoints
+        : [
+            { x: 0, y: 0 },
+            { x: 0, y: depth ?? 8 },
+          ];
+    const points = blockOpt
+      ? (() => {
+          const origin =
+            motionOrigin && motionOrigin.slot === player.slot
+              ? motionOrigin
+              : { x: player.x, y: player.y, strength: callStrength };
+          return absolutePathPoints(origin.x, origin.y, relative, origin.strength);
+        })()
+      : buildRoutePointsForPlayer(player, relative, callStrength, motionOrigin);
     return {
       title: '',
-      players: [{ ...player, x: 0, y: 0, highlight: true }],
+      players: [{ ...player, highlight: true }],
       arrows: [
         {
           id: 'preview',
           playerId: player.id,
-          points: waypoints.length >= 2 ? waypoints : [{ x: 0, y: 0 }, { x: 0, y: depth }],
+          points: points.length >= 2 ? points : relative,
           curve: route?.curve ?? 'rounded',
           arrowhead: blockOpt ? 'block' : route?.arrowhead ?? 'arrow',
           color: colors.routeYellow,
@@ -98,7 +121,17 @@ export function Inspector({
       annotations: [],
       gapLabels: [],
     };
-  }, [player, hasRoute, route, blockOpt, builder.draftDepth]);
+  }, [
+    player,
+    hasRoute,
+    route,
+    blockOpt,
+    builder.draftDepth,
+    builder.choiceUsesDepth,
+    builder.strength,
+    builder.motion,
+    builder.scene.players,
+  ]);
 
   return (
     <View style={[styles.wrap, variant === 'sheet' && styles.wrapSheet]}>

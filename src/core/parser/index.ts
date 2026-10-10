@@ -1,6 +1,12 @@
 export { parsePlaycall } from './tokenize';
-export { resolvePlay, buildPlay, NO_ROUTE_ID } from './resolve';
-export type { ResolveOptions, AssignmentOverride } from './resolve';
+export {
+  resolvePlay,
+  buildPlay,
+  NO_ROUTE_ID,
+  buildRoutePointsForPlayer,
+  motionOriginForSnap,
+} from './resolve';
+export type { ResolveOptions, AssignmentOverride, MotionOrigin } from './resolve';
 export {
   parseDefenseCall,
   composeDefenseCall,
