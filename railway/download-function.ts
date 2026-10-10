@@ -1,7 +1,7 @@
 const APK_URL =
-  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=84050ee";
+  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=2eb6ac1";
 const FILENAME = "audible-1.0.0.apk";
-const BUILD_LABEL = "1.0.5 (main @ 84050ee)";
+const BUILD_LABEL = "1.0.6 (main @ 2eb6ac1)";
 
 const PAGE = `<!doctype html>
 <html>
@@ -20,7 +20,7 @@ const PAGE = `<!doctype html>
 <body>
   <main>
     <h1>Audible</h1>
-    <p>Build <code>${BUILD_LABEL}</code>: fixes Build tab crash on open; assignment route preview matches the main field; Android assignment sheet above the nav bar. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
+    <p>Build <code>${BUILD_LABEL}</code>: centered assignment route preview with correct mirroring; Build tab crash fix; Android assignment sheet above the nav bar. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
     <a href="/audible-1.0.0.apk">Download APK</a>
   </main>
 </body>
