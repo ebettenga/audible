@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FieldCanvas } from '@/src/render';
 import { buildPlay, buildDefense } from '@/src/core/parser';
 import {
@@ -63,6 +64,9 @@ export default function PlayDetailScreen() {
   }>();
   const router = useRouter();
   const { isMobile } = useBreakpoint();
+  const insets = useSafeAreaInsets();
+  const topInset = Platform.OS === 'web' ? 0 : insets.top;
+  const bottomInset = Platform.OS === 'web' ? 0 : insets.bottom;
   const isNew = id === 'new';
   const collectionId =
     typeof collectionIdParam === 'string' && collectionIdParam
@@ -273,22 +277,28 @@ export default function PlayDetailScreen() {
 
   if (isNew) {
     return (
-      <View style={styles.screen}>
+      <SafeAreaView style={[styles.screen, styles.loading]} edges={['top', 'bottom']}>
         <Text style={styles.muted}>Opening builder…</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!play) {
     return (
-      <View style={styles.screen}>
+      <SafeAreaView style={[styles.screen, styles.loading]} edges={['top', 'bottom']}>
         <Text style={styles.muted}>Loading play…</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: topInset + 12, paddingBottom: bottomInset + 48 },
+      ]}
+    >
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
@@ -633,6 +643,7 @@ export default function PlayDetailScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
+  loading: { justifyContent: 'center', padding: 24 },
   content: { padding: 24, paddingBottom: 48, gap: 12 },
   muted: { color: colors.muted },
   error: { color: '#e98c80', fontSize: 12 },

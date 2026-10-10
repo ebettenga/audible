@@ -7,7 +7,7 @@ import { FRONTS } from '@/src/data/fronts';
 import { PRESSURES } from '@/src/data/pressures';
 import { CONCEPTS } from '@/src/data/concepts';
 import { PERSONNEL, sceneForPersonnel } from '@/src/data/personnel';
-import { factsForTopic } from '@/src/data/quizFacts';
+import { factsForTopic, type QuizFact } from '@/src/data/quizFacts';
 import { buildPlay, buildDefense, parsePlaycall } from '@/src/core/parser';
 import type { Collection, FlashCard, Playbook, PlaybookPlay, TrainingTopic } from './types';
 import {
@@ -102,18 +102,302 @@ export function cardsForLearn(book: Playbook | undefined | null, topic?: Trainin
   ];
 }
 
+function tryBuildPlay(playcall: string, includeDefense = false): PlayScene | undefined {
+  try {
+    return { ...buildPlay(playcall, { includeDefense }), title: '' };
+  } catch {
+    return undefined;
+  }
+}
+
+function tryBuildDefense(playcall: string, stripArrows = false): PlayScene | undefined {
+  try {
+    const scene = buildDefense(playcall, {
+      vsPlaycall: 'Gun Doubles Right 62 Slant-Flat',
+    });
+    return {
+      ...scene,
+      title: '',
+      arrows: stripArrows ? [] : scene.arrows,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function sceneForRunName(runName: string): { playcall: string; scene: PlayScene } {
+  const calls = [
+    `Gun Doubles Right Fake ${runName}`,
+    `I Right Fake ${runName}`,
+    `I Tight Right Fake ${runName}`,
+    `Shotgun Right Fake ${runName}`,
+  ];
+  for (const playcall of calls) {
+    const scene = tryBuildPlay(playcall);
+    if (scene) return { playcall, scene };
+  }
+  return {
+    playcall: 'I Right',
+    scene: tryBuildPlay('I Right') ?? sceneFromFormation('i', ''),
+  };
+}
+
+function sceneForConceptName(
+  conceptName: string,
+  aliases: string[] = [],
+): { playcall: string; scene?: PlayScene } {
+  for (const token of [conceptName, ...aliases]) {
+    const playcall = `Gun Doubles Right 62 ${token}`;
+    const scene = tryBuildPlay(playcall);
+    if (scene) return { playcall, scene };
+  }
+  return {
+    playcall: `Gun Doubles Right 62 ${conceptName}`,
+    scene: tryBuildPlay('Gun Doubles Right'),
+  };
+}
+
+function fallbackSceneForTopic(topic: TrainingTopic): PlayScene {
+  switch (topic) {
+    case 'running-routes':
+      return tryBuildPlay('I Right Fake Inside Zone') ?? fallbackSceneForTopic('formations');
+    case 'passing-routes':
+    case 'play-calls':
+      return tryBuildPlay('Gun Doubles Right 62 Mesh') ?? fallbackSceneForTopic('formations');
+    case 'fronts':
+    case 'coverages':
+    case 'pressures':
+    case 'zones':
+    case 'defender-assignments':
+    case 'coverage-reads':
+      return tryBuildDefense('4-3 Cover 3', true) ?? fallbackSceneForTopic('formations');
+    default:
+      return tryBuildPlay('Ace Twins Right') ?? {
+        ...buildPlay('Ace Twins Right', { includeDefense: false }),
+        title: '',
+      };
+  }
+}
+
+/** Formation / concept / front that matches the teaching fact, not a generic leftover play. */
+function diagramForFact(fact: QuizFact): Pick<FlashCard, 'playcall' | 'scene' | 'resolveOptions'> {
+  const group = fact.group ?? fact.id;
+
+  if (fact.topic === 'formations') {
+    const formationId =
+      {
+        't-formation': 'wishbone',
+        'i-formation': 'i',
+        ace: 'ace-twins',
+        'pro-set': 'strong-i',
+        shotgun: 'shotgun',
+        pistol: 'pistol',
+        spread: 'gun-trips',
+        wildcat: 'shotgun',
+        empty: 'gun-empty',
+        jumbo: 'i-tight',
+        purpose: 'ace-twins',
+      }[group] ?? 'ace-twins';
+    const formation = FORMATIONS.find((f) => f.id === formationId);
+    return {
+      playcall: `${formation?.name ?? 'Ace Twins'} Right`,
+      scene: sceneFromFormation(formationId, ''),
+      resolveOptions: { includeDefense: false },
+    };
+  }
+
+  if (fact.topic === 'personnel') {
+    const code =
+      {
+        '11': '11',
+        '12': '12',
+        '21': '21',
+        '13': '13',
+        '10': '10',
+        '22': '22',
+        '20': '20',
+        '00': '00',
+        code: '11',
+        box: '11',
+        labels: '11',
+      }[group] ?? '11';
+    const playcall =
+      {
+        '11': 'Gun Doubles Right',
+        '12': 'Gun Trey Right',
+        '21': 'I Right',
+        '13': 'I Tight Right',
+        '10': 'Doubles Flex Right',
+        '22': 'I Tight Right',
+        '20': 'I Slot Right',
+        '00': 'Gun Empty Right',
+        code: 'Gun Doubles Right',
+        box: 'Gun Doubles Right',
+        labels: 'Gun Doubles Right',
+      }[group] ?? 'Gun Doubles Right';
+    const pkg = PERSONNEL.find((p) => p.code === code) ?? PERSONNEL[0]!;
+    return {
+      playcall,
+      scene: sceneForPersonnel(pkg),
+      resolveOptions: { includeDefense: false },
+    };
+  }
+
+  if (fact.topic === 'passing-routes') {
+    const conceptName =
+      {
+        mesh: 'Mesh',
+        levels: 'Levels',
+        flood: 'Flood',
+        smash: 'Smash',
+        'y-cross': 'Y Cross',
+        'four-verticals': 'Four Verticals',
+        stick: 'Stick',
+        drive: 'Drive',
+        dagger: 'Dagger',
+        'slant-flat': 'Slant-Flat',
+        china: 'Smash',
+        'shallow-cross': 'High Cross',
+      }[group] ?? 'Mesh';
+    const playcall = `Gun Doubles Right 62 ${conceptName}`;
+    return {
+      playcall,
+      scene: tryBuildPlay(playcall),
+      resolveOptions: { includeDefense: false },
+    };
+  }
+
+  if (fact.topic === 'running-routes') {
+    const playcall =
+      {
+        scheme: 'I Right Fake Inside Zone',
+        gap: 'I Right Fake 24 Lead',
+        gaps: 'I Right Fake 24 Lead',
+        holes: 'I Right Fake 24 Lead',
+        techniques: 'I Right Fake Inside Zone',
+        'inside-zone': 'Gun Doubles Right Fake Inside Zone',
+        'lead-dive': 'I Right Fake 22 Dive',
+        iso: 'I Right Fake Iso',
+        'man-dive': 'Ace Twins Right Fake 22 Dive',
+        'split-zone': 'Gun Doubles Right Fake Split Zone',
+        'zone-read': 'Shotgun Right Fake Inside Zone',
+        'outside-zone': 'Gun Doubles Right Fake Wide Zone',
+        'jet-zone': 'Gun Doubles Right Fake Jet Sweep',
+        power: 'I Right Fake 26 Lead',
+        counter: 'I Right Fake Counter',
+        duo: 'I Tight Right Fake Duo',
+        trap: 'I Right Fake Trap',
+        wham: 'I Tight Right Fake Trap',
+        'g-lead': 'I Right Fake 26 Lead',
+        't-lead': 'I Tight Right Fake 26 Lead',
+        dart: 'I Right Fake Counter',
+        'speed-option': 'Shotgun Right Fake Speed Option',
+      }[group] ?? 'I Right Fake Inside Zone';
+    return {
+      playcall,
+      scene: tryBuildPlay(playcall) ?? tryBuildPlay('I Right Fake Inside Zone'),
+      resolveOptions: { includeDefense: false },
+    };
+  }
+
+  if (fact.topic === 'fronts') {
+    const frontName =
+      {
+        '6-2': 'Bear',
+        '5-3': 'Bear',
+        '52-eagle': '4-3',
+        '4-4': '3-3 Stack',
+        '3-4': '3-4',
+        '4-3': '4-3',
+        bear: 'Bear',
+        nickel: 'Nickel',
+        dime: 'Dime',
+      }[group] ?? '4-3';
+    const playcall = `${frontName} Cover 3`;
+    const front = FRONTS.find((f) => f.name === frontName);
+    return {
+      playcall,
+      scene: tryBuildDefense(playcall, true),
+      resolveOptions: { frontId: front?.id ?? '4-3', coverageId: 'cover-3', includeDefense: true },
+    };
+  }
+
+  if (fact.topic === 'coverages') {
+    const coverageName =
+      {
+        'cover-0': 'Cover 0',
+        'cover-1': 'Cover 1',
+        'cover-1-robber': 'Cover 1 Robber',
+        'cover-2': 'Cover 2',
+        'cover-2-man': '2-Man',
+        'cover-2-buzz': 'Cover 2',
+        'tampa-2': 'Tampa 2',
+        'cover-3': 'Cover 3',
+        'cover-3-cloud': 'Cover 3 Sky',
+        'cover-3-buzz': 'Cover 3 Buzz',
+        'cover-4': 'Cover 4',
+        'cover-6': 'Cover 6',
+      }[group] ?? 'Cover 3';
+    const playcall = `4-3 ${coverageName}`;
+    const coverage = COVERAGES.find((c) => c.name === coverageName);
+    return {
+      playcall,
+      scene: tryBuildDefense(playcall, true),
+      resolveOptions: { coverageId: coverage?.id ?? 'cover-3', frontId: '4-3', includeDefense: true },
+    };
+  }
+
+  if (fact.topic === 'pressures') {
+    const pressureName =
+      {
+        simulated: 'Creeper',
+        blitz: 'A-Gap Mug',
+        'second-level': 'Cross Dog',
+        labels: 'Base',
+        protection: 'A-Gap Mug',
+        perimeter: 'Corner Blitz',
+        'fire-zone': 'Fire Zone',
+        stunt: 'Twin Twist',
+        zero: 'Zero',
+      }[group] ?? 'Fire Zone';
+    const playcall =
+      pressureName === 'Base' ? '4-3 Cover 3' : `4-3 Cover 1 ${pressureName}`;
+    return {
+      playcall,
+      scene: tryBuildDefense(playcall, pressureName === 'Base'),
+      resolveOptions: {
+        frontId: '4-3',
+        coverageId: pressureName === 'Base' ? 'cover-3' : 'cover-1',
+        includeDefense: true,
+      },
+    };
+  }
+
+  return {
+    playcall: 'Ace Twins Right',
+    scene: tryBuildPlay('Ace Twins Right'),
+    resolveOptions: { includeDefense: false },
+  };
+}
+
 function factCards(topic: TrainingTopic): FlashCard[] {
-  return factsForTopic(topic).map((fact) => ({
-    id: `fact-${fact.id}`,
-    topic: fact.topic,
-    type: fact.type,
-    prompt: fact.prompt,
-    answer: fact.answer,
-    distractors: fact.distractors,
-    explain: fact.explain,
-    group: fact.group ?? fact.id,
-    hideTitle: true,
-  }));
+  return factsForTopic(topic).map((fact) => {
+    const diagram = diagramForFact(fact);
+    return {
+      id: `fact-${fact.id}`,
+      topic: fact.topic,
+      type: fact.type,
+      prompt: fact.prompt,
+      answer: fact.answer,
+      distractors: fact.distractors,
+      explain: fact.explain,
+      group: fact.group ?? fact.id,
+      hideTitle: true,
+      playcall: diagram.playcall,
+      scene: diagram.scene,
+      resolveOptions: diagram.resolveOptions,
+    };
+  });
 }
 
 function personnelCards(): FlashCard[] {
@@ -247,17 +531,7 @@ function runningRouteCards(): FlashCard[] {
   const names = RUNS.map((r) => r.name);
   const cards: FlashCard[] = [];
   for (const r of RUNS) {
-    const playcall = `Gun Doubles Right Fake ${r.name}`;
-    let scene: PlayScene;
-    try {
-      scene = buildPlay(playcall, { includeDefense: false });
-    } catch {
-      try {
-        scene = buildPlay(`I Right Fake ${r.name}`, { includeDefense: false });
-      } catch {
-        scene = buildPlay('Gun Doubles Right Wide Zone', { includeDefense: false });
-      }
-    }
+    const { playcall, scene } = sceneForRunName(r.name);
     const explain =
       r.description ??
       `${r.name} attacks hole ${r.hole}${r.bestVs ? ` — best vs ${r.bestVs}` : ''}.`;
@@ -270,7 +544,7 @@ function runningRouteCards(): FlashCard[] {
       distractors: pickDistractors(r.name, names),
       distractorPool: names,
       playcall,
-      scene: { ...scene, title: '' },
+      scene,
       explain,
       group: r.id,
       hideTitle: true,
@@ -327,13 +601,7 @@ function passingRouteCards(): FlashCard[] {
   // Concept identification + primary-read variants
   const conceptNames = CONCEPTS.map((c) => c.name);
   for (const concept of CONCEPTS) {
-    const playcall = `Gun Doubles Right 62 ${concept.name}`;
-    let scene: PlayScene | undefined;
-    try {
-      scene = buildPlay(playcall, { includeDefense: false });
-    } catch {
-      scene = undefined;
-    }
+    const { playcall, scene } = sceneForConceptName(concept.name, concept.aliases);
     const explain =
       concept.description ?? `${concept.name} — ${concept.primaryRead ?? 'concept family'}.`;
     cards.push({
@@ -345,7 +613,7 @@ function passingRouteCards(): FlashCard[] {
       distractors: pickDistractors(concept.name, conceptNames),
       distractorPool: conceptNames,
       playcall,
-      scene: scene ? { ...scene, title: '' } : undefined,
+      scene,
       explain,
       group: concept.id,
       hideTitle: true,
@@ -361,7 +629,7 @@ function passingRouteCards(): FlashCard[] {
         answer: concept.primaryRead,
         distractors: pickDistractors(concept.primaryRead, reads),
         playcall,
-        scene: scene ? { ...scene, title: '' } : undefined,
+        scene,
         explain,
         group: concept.id,
         hideTitle: true,
@@ -852,7 +1120,7 @@ export function getCardScene(card: FlashCard) {
       /* fall through */
     }
   }
-  return buildPlay('Gun Doubles Right Wide Zone', { includeDefense: false });
+  return fallbackSceneForTopic(card.topic);
 }
 
 /**

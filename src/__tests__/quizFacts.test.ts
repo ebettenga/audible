@@ -1,6 +1,6 @@
 import { FORMATIONS } from '@/src/data/formations';
 import { QUIZ_FACTS, factsForTopic } from '@/src/data/quizFacts';
-import { generateCards } from '@/src/training/cards';
+import { generateCards, getCardScene } from '@/src/training/cards';
 import type { TrainingTopic } from '@/src/training/types';
 
 const FACT_TOPICS: TrainingTopic[] = [
@@ -157,6 +157,140 @@ describe('transcript-backed quiz facts', () => {
         expect(card?.prompt).toBe(fact.prompt);
         expect(card?.answer).toBe(fact.answer);
         expect(card?.explain).toBe(fact.explain);
+      }
+    }
+  });
+
+  it('shows a relevant play for every fact, not a leftover Wide Zone', () => {
+    const hints: Partial<Record<TrainingTopic, Record<string, string>>> = {
+      formations: {
+        't-formation': 'Wishbone',
+        'i-formation': 'I Right',
+        ace: 'Ace Twins',
+        'pro-set': 'Strong I',
+        shotgun: 'Shotgun',
+        pistol: 'Pistol',
+        spread: 'Gun Trips',
+        wildcat: 'Shotgun',
+        empty: 'Gun Empty',
+        jumbo: 'I Tight',
+        purpose: 'Ace Twins',
+      },
+      personnel: {
+        '11': 'Gun Doubles',
+        '12': 'Gun Trey',
+        '21': 'I Right',
+        '13': 'I Tight',
+        '10': 'Doubles Flex',
+        '22': 'I Tight',
+        code: 'Gun Doubles',
+        box: 'Gun Doubles',
+        labels: 'Gun Doubles',
+      },
+      'passing-routes': {
+        mesh: 'Mesh',
+        levels: 'Levels',
+        flood: 'Flood',
+        smash: 'Smash',
+        'y-cross': 'Y Cross',
+        'four-verticals': 'Four Verticals',
+        stick: 'Stick',
+        drive: 'Drive',
+        dagger: 'Dagger',
+        'slant-flat': 'Slant-Flat',
+        china: 'Smash',
+        'shallow-cross': 'High Cross',
+      },
+      'running-routes': {
+        scheme: 'Inside Zone',
+        gap: '24 Lead',
+        gaps: '24 Lead',
+        holes: '24 Lead',
+        techniques: 'Inside Zone',
+        'inside-zone': 'Inside Zone',
+        'lead-dive': '22 Dive',
+        iso: 'Iso',
+        'man-dive': '22 Dive',
+        'split-zone': 'Split Zone',
+        'zone-read': 'Inside Zone',
+        'outside-zone': 'Wide Zone',
+        'jet-zone': 'Jet Sweep',
+        power: '26 Lead',
+        counter: 'Counter',
+        duo: 'Duo',
+        trap: 'Trap',
+        wham: 'Trap',
+        'g-lead': '26 Lead',
+        't-lead': '26 Lead',
+        dart: 'Counter',
+        'speed-option': 'Speed Option',
+      },
+      fronts: {
+        '6-2': 'Bear',
+        '5-3': 'Bear',
+        '52-eagle': '4-3',
+        '4-4': '3-3 Stack',
+        '3-4': '3-4',
+        '4-3': '4-3',
+        bear: 'Bear',
+        nickel: 'Nickel',
+        dime: 'Dime',
+      },
+      coverages: {
+        'cover-0': 'Cover 0',
+        'cover-1': 'Cover 1',
+        'cover-1-robber': 'Cover 1 Robber',
+        'cover-2': 'Cover 2',
+        'cover-2-man': '2-Man',
+        'cover-2-buzz': 'Cover 2',
+        'tampa-2': 'Tampa 2',
+        'cover-3': 'Cover 3',
+        'cover-3-cloud': 'Cover 3 Sky',
+        'cover-3-buzz': 'Cover 3 Buzz',
+        'cover-4': 'Cover 4',
+        'cover-6': 'Cover 6',
+      },
+      pressures: {
+        simulated: 'Creeper',
+        blitz: 'A-Gap Mug',
+        'second-level': 'Cross Dog',
+        labels: 'Cover 3',
+        protection: 'A-Gap Mug',
+        perimeter: 'Corner Blitz',
+        'fire-zone': 'Fire Zone',
+        stunt: 'Twin Twist',
+        zero: 'Zero',
+      },
+    };
+
+    for (const topic of FACT_TOPICS) {
+      const cards = generateCards(topic).filter((card) => card.id.startsWith('fact-'));
+      expect(cards.length).toBeGreaterThan(0);
+      for (const card of cards) {
+        const scene = getCardScene(card);
+        expect(card.playcall).toBeTruthy();
+        expect(card.scene).toBeDefined();
+        expect(scene.players.length).toBeGreaterThanOrEqual(11);
+        const label = `${card.playcall ?? ''} ${scene.title ?? ''}`;
+        if (card.group !== 'outside-zone') {
+          expect(label).not.toMatch(/Wide Zone/);
+        }
+        const hint = hints[topic]?.[card.group ?? ''];
+        if (hint) {
+          expect(card.playcall).toContain(hint);
+        }
+      }
+    }
+  });
+
+  it('does not reuse Wide Zone art on unrelated run or pass questions', () => {
+    for (const topic of ['running-routes', 'passing-routes', 'formations', 'personnel'] as const) {
+      for (const card of generateCards(topic)) {
+        if (/wide zone/i.test(card.answer) || card.group === 'outside-zone' || /wide zone/i.test(card.prompt)) {
+          continue;
+        }
+        const scene = getCardScene(card);
+        expect(`${card.playcall ?? ''} ${scene.title ?? ''}`).not.toMatch(/Wide Zone/);
       }
     }
   });
