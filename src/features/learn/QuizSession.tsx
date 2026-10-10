@@ -251,7 +251,11 @@ export function QuizSession({
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.reviewLabel}>{TOPIC_META[q.card.topic].title}</Text>
+                  <Text style={styles.reviewLabel}>
+                    {q.card.theme
+                      ? `${TOPIC_META[q.card.topic].title} · ${q.card.theme}`
+                      : TOPIC_META[q.card.topic].title}
+                  </Text>
                   <Text style={styles.reviewAnswer} numberOfLines={1}>
                     {q.card.answer}
                   </Text>
@@ -350,7 +354,11 @@ export function QuizSession({
           <View style={styles.visualLabel}>
             <View>
               <Eyebrow>{`Question ${index + 1} of ${questions.length}`}</Eyebrow>
-              <Text style={styles.qLabel}>{TOPIC_META[question.card.topic].title}</Text>
+              <Text style={styles.qLabel}>
+                {question.card.theme
+                  ? `${TOPIC_META[question.card.topic].title} · ${question.card.theme}`
+                  : TOPIC_META[question.card.topic].title}
+              </Text>
             </View>
           </View>
           <View style={styles.fieldFrame}>

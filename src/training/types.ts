@@ -54,6 +54,8 @@ export interface FlashCard {
    * (e.g. coverage id, formation id, concept id).
    */
   group?: string;
+  /** Display label for a family of related questions (e.g. "West Coast"). */
+  theme?: string;
   /** Extra answers that can be drawn as distractors for this family. */
   distractorPool?: string[];
   /** Resolver options (e.g. coverage) */

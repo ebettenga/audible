@@ -1,5 +1,7 @@
 import { FORMATIONS } from '@/src/data/formations';
 import { QUIZ_FACTS, factsForTopic } from '@/src/training/quizCache';
+import { PLAY_CALL_THEMES, QUIZ_SCHEME_FACTS } from '@/src/data/quizSchemeFacts';
+import { buildPlay } from '@/src/core/parser';
 import { generateCards, getCardScene } from '@/src/training/cards';
 import { buildQuiz } from '@/src/training/quiz';
 import type { TrainingTopic } from '@/src/training/types';
@@ -19,7 +21,7 @@ describe('transcript-backed quiz facts', () => {
   it('covers every Fourth and Film Learn topic with unique, well-formed facts', () => {
     const ids = QUIZ_FACTS.map((fact) => fact.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(155);
+    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(280);
 
     for (const topic of FACT_TOPICS) {
       const facts = factsForTopic(topic);
@@ -324,6 +326,30 @@ describe('transcript-backed quiz facts', () => {
       for (const choice of fact.distractors) {
         expect(choice).not.toMatch(jokes);
       }
+    }
+  });
+
+  it('builds a themed scheme bank for play calls with a diagram per question', () => {
+    expect(QUIZ_SCHEME_FACTS.length).toBeGreaterThanOrEqual(100);
+    expect(factsForTopic('play-calls').length).toBeGreaterThanOrEqual(120);
+
+    const labels = Object.values(PLAY_CALL_THEMES);
+    for (const label of labels) {
+      expect(QUIZ_SCHEME_FACTS.filter((f) => f.theme === label).length).toBeGreaterThanOrEqual(4);
+    }
+
+    for (const f of QUIZ_SCHEME_FACTS) {
+      expect(f.topic).toBe('play-calls');
+      expect(labels).toContain(f.theme);
+      expect(() => buildPlay(f.playcall!, { includeDefense: false })).not.toThrow();
+    }
+
+    const cards = generateCards('play-calls').filter((c) => c.id.startsWith('fact-scheme-'));
+    expect(cards).toHaveLength(QUIZ_SCHEME_FACTS.length);
+    for (const card of cards) {
+      const source = QUIZ_SCHEME_FACTS.find((f) => `fact-${f.id}` === card.id)!;
+      expect(card.playcall).toBe(source.playcall);
+      expect(card.theme).toBe(source.theme);
     }
   });
 

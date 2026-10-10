@@ -14,6 +14,8 @@ type QuizRow = {
   distractors_json: string;
   explain: string;
   group_key: string | null;
+  theme: string | null;
+  playcall: string | null;
 };
 
 function rowToFact(row: QuizRow): QuizFact {
@@ -32,7 +34,17 @@ function rowToFact(row: QuizRow): QuizFact {
     distractors,
     explain: row.explain,
     group: row.group_key ?? undefined,
+    theme: row.theme ?? undefined,
+    playcall: row.playcall ?? undefined,
   };
+}
+
+async function hasColumn(
+  db: import('expo-sqlite').SQLiteDatabase,
+  column: string,
+): Promise<boolean> {
+  const cols = await db.getAllAsync<{ name: string }>('PRAGMA table_info(quiz_questions)');
+  return cols.some((c) => c.name === column);
 }
 
 export async function ensureQuizQuestionsTable(
@@ -47,10 +59,18 @@ export async function ensureQuizQuestionsTable(
       answer TEXT NOT NULL,
       distractors_json TEXT NOT NULL,
       explain TEXT NOT NULL,
-      group_key TEXT
+      group_key TEXT,
+      theme TEXT,
+      playcall TEXT
     );
     CREATE INDEX IF NOT EXISTS idx_quiz_questions_topic ON quiz_questions(topic);
   `);
+  if (!(await hasColumn(db, 'theme'))) {
+    await db.execAsync('ALTER TABLE quiz_questions ADD COLUMN theme TEXT;');
+  }
+  if (!(await hasColumn(db, 'playcall'))) {
+    await db.execAsync('ALTER TABLE quiz_questions ADD COLUMN playcall TEXT;');
+  }
 }
 
 async function storedQuizBankVersion(
@@ -70,28 +90,32 @@ export async function seedQuizQuestionsIfNeeded(
   const stored = await storedQuizBankVersion(db);
   if (stored >= QUIZ_BANK_VERSION) return;
 
-  await db.execAsync('DELETE FROM quiz_questions;');
-  for (const fact of QUIZ_FACTS_BUNDLED) {
-    await db.runAsync(
-      `INSERT INTO quiz_questions (
-        id, topic, type, prompt, answer, distractors_json, explain, group_key
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        fact.id,
-        fact.topic,
-        fact.type,
-        fact.prompt,
-        fact.answer,
-        JSON.stringify(fact.distractors),
-        fact.explain,
-        fact.group ?? null,
-      ],
-    );
-  }
-  await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', [
-    'quiz_bank_version',
-    String(QUIZ_BANK_VERSION),
-  ]);
+  await db.withTransactionAsync(async () => {
+    await db.execAsync('DELETE FROM quiz_questions;');
+    for (const fact of QUIZ_FACTS_BUNDLED) {
+      await db.runAsync(
+        `INSERT INTO quiz_questions (
+          id, topic, type, prompt, answer, distractors_json, explain, group_key, theme, playcall
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          fact.id,
+          fact.topic,
+          fact.type,
+          fact.prompt,
+          fact.answer,
+          JSON.stringify(fact.distractors),
+          fact.explain,
+          fact.group ?? null,
+          fact.theme ?? null,
+          fact.playcall ?? null,
+        ],
+      );
+    }
+    await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', [
+      'quiz_bank_version',
+      String(QUIZ_BANK_VERSION),
+    ]);
+  });
 }
 
 export async function loadQuizFactsFromDb(

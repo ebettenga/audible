@@ -10,6 +10,10 @@ export interface QuizFact {
   distractors: string[];
   explain: string;
   group?: string;
+  /** Display label tying related questions together (e.g. an offensive scheme). */
+  theme?: string;
+  /** Play call drawn on the card; falls back to a topic diagram when it does not parse. */
+  playcall?: string;
 }
 
 export const QUIZ_CORE_FACTS: QuizFact[] = [

@@ -347,6 +347,37 @@ function diagramForFact(fact: QuizFact): Pick<FlashCard, 'playcall' | 'scene' | 
     };
   }
 
+  if (fact.topic === 'play-calls') {
+    const candidates = [
+      fact.playcall,
+      {
+        mesh: 'Gun Doubles Right 62 Mesh',
+        dagger: 'Gun Doubles Right 62 Dagger',
+        stick: 'Gun Doubles Right 62 Stick',
+        'four-verticals': 'Gun Doubles Right 62 Four Verticals',
+        'inside-zone': 'I Right Fake Inside Zone',
+        'outside-zone': 'Gun Doubles Right Fake Wide Zone',
+        power: 'I Right Fake 26 Lead',
+        counter: 'I Right Fake Counter',
+        'lead-dive': 'I Right Fake 24 Lead',
+        boot: 'Gun Doubles Right 62 Boot',
+        'zone-read': 'Shotgun Right Fake Inside Zone',
+        protection: 'Gun Doubles Right 62 Spacing',
+        personnel: 'Gun Doubles Right 62 Spacing',
+        language: 'I Right Fake 24 Lead',
+      }[group],
+    ].filter((call): call is string => !!call);
+    for (const playcall of candidates) {
+      const scene = tryBuildPlay(playcall);
+      if (scene) return { playcall, scene, resolveOptions: { includeDefense: false } };
+    }
+    return {
+      playcall: 'Gun Doubles Right 62 Mesh',
+      scene: fallbackSceneForTopic('play-calls'),
+      resolveOptions: { includeDefense: false },
+    };
+  }
+
   if (fact.topic === 'pressures') {
     const pressureName =
       {
@@ -392,6 +423,7 @@ function factCards(topic: TrainingTopic): FlashCard[] {
       distractors: fact.distractors,
       explain: fact.explain,
       group: fact.group ?? fact.id,
+      theme: fact.theme,
       hideTitle: true,
       playcall: diagram.playcall,
       scene: diagram.scene,
