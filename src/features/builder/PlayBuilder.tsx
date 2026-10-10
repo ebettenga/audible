@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Platform, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FieldCanvas } from '@/src/render';
 import { Button, KeyHint, ModalShell } from '@/src/ui';
 import { colors, typography, radius, shadows, useBreakpoint } from '@/src/design';
@@ -20,7 +21,10 @@ export function PlayBuilder({
   saveError?: string | null;
 }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { isDesktop, isMobile } = useBreakpoint();
+  const sheetScrollPadBottom =
+    Platform.OS === 'android' ? Math.max(insets.bottom, 48) + 12 : Math.max(insets.bottom, 12) + 12;
   const showSideInspector = isDesktop;
   const showMobileAssignmentSheet = !isDesktop && !!builder.selectedSlot;
   const assignmentTitle = builder.selectedPlayer
@@ -119,7 +123,10 @@ export function PlayBuilder({
         >
           <ScrollView
             style={styles.mobileSheetScroll}
-            contentContainerStyle={styles.mobileSheetScrollContent}
+            contentContainerStyle={[
+              styles.mobileSheetScrollContent,
+              { paddingBottom: sheetScrollPadBottom },
+            ]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >

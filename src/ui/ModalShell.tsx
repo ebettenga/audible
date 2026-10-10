@@ -10,8 +10,16 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, type IconName } from './Icon';
 import { colors, typography, radius } from '@/src/design';
+
+/** Bottom sheets need extra inset on Android 3-button nav (often reports 0). */
+function sheetBottomInset(insets: { bottom: number }): number {
+  if (Platform.OS === 'web') return 0;
+  if (Platform.OS === 'android') return Math.max(insets.bottom, 48);
+  return Math.max(insets.bottom, 12);
+}
 
 /**
  * Shared dialog chrome: dimmed backdrop, centered width-capped card with an accent
@@ -46,7 +54,9 @@ export function ModalShell({
   footer?: React.ReactNode;
   cardStyle?: StyleProp<ViewStyle>;
 }) {
+  const insets = useSafeAreaInsets();
   const sheet = align === 'bottom';
+  const sheetPadBottom = sheet ? sheetBottomInset(insets) : 0;
   return (
     <Modal
       visible={visible}
@@ -72,6 +82,7 @@ export function ModalShell({
             styles.card,
             { maxWidth: sheet ? undefined : maxWidth },
             sheet && styles.cardBottom,
+            sheet && sheetPadBottom > 0 && { paddingBottom: sheetPadBottom },
             cardStyle,
           ]}
         >
