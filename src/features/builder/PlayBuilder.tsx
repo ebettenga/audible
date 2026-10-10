@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FieldCanvas } from '@/src/render';
 import { Button, KeyHint, ModalShell } from '@/src/ui';
+import { sheetBottomInset } from '@/src/ui/ModalShell';
 import { colors, typography, radius, shadows, useBreakpoint } from '@/src/design';
 import { Inspector } from './Inspector';
 import { CallControls } from './CallControls';
@@ -23,8 +24,7 @@ export function PlayBuilder({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isDesktop, isMobile } = useBreakpoint();
-  const sheetScrollPadBottom =
-    Platform.OS === 'android' ? Math.max(insets.bottom, 48) + 12 : Math.max(insets.bottom, 12) + 12;
+  const sheetScrollPadBottom = sheetBottomInset(insets) + 12;
   const showSideInspector = isDesktop;
   const showMobileAssignmentSheet = !isDesktop && !!builder.selectedSlot;
   const assignmentTitle = builder.selectedPlayer

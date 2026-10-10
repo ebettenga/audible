@@ -15,7 +15,7 @@ import { Icon, type IconName } from './Icon';
 import { colors, typography, radius } from '@/src/design';
 
 /** Bottom sheets need extra inset on Android 3-button nav (often reports 0). */
-function sheetBottomInset(insets: { bottom: number }): number {
+export function sheetBottomInset(insets: { bottom: number }): number {
   if (Platform.OS === 'web') return 0;
   if (Platform.OS === 'android') return Math.max(insets.bottom, 48);
   return Math.max(insets.bottom, 12);
@@ -70,6 +70,7 @@ export function ModalShell({
           styles.backdrop,
           align === 'top' && styles.backdropTop,
           sheet && styles.backdropBottom,
+          sheet && sheetPadBottom > 0 && { paddingBottom: sheetPadBottom },
         ]}
       >
         <Pressable
@@ -82,7 +83,6 @@ export function ModalShell({
             styles.card,
             { maxWidth: sheet ? undefined : maxWidth },
             sheet && styles.cardBottom,
-            sheet && sheetPadBottom > 0 && { paddingBottom: sheetPadBottom },
             cardStyle,
           ]}
         >
