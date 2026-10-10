@@ -39,25 +39,42 @@ export function ModalShell({
   icon?: IconName;
   accent?: string;
   maxWidth?: number;
-  align?: 'center' | 'top';
+  align?: 'center' | 'top' | 'bottom';
   hideHeader?: boolean;
   flush?: boolean;
   children: React.ReactNode;
   footer?: React.ReactNode;
   cardStyle?: StyleProp<ViewStyle>;
 }) {
+  const sheet = align === 'bottom';
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType={sheet ? 'slide' : 'fade'}
+      onRequestClose={onClose}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={[styles.backdrop, align === 'top' && styles.backdropTop]}
+        style={[
+          styles.backdrop,
+          align === 'top' && styles.backdropTop,
+          sheet && styles.backdropBottom,
+        ]}
       >
         <Pressable
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           accessibilityLabel="Close dialog"
         />
-        <View style={[styles.card, { maxWidth }, cardStyle]}>
+        <View
+          style={[
+            styles.card,
+            { maxWidth: sheet ? undefined : maxWidth },
+            sheet && styles.cardBottom,
+            cardStyle,
+          ]}
+        >
           <View style={[styles.accent, { backgroundColor: accent }]} />
           {hideHeader ? null : (
             <View style={styles.header}>
@@ -98,6 +115,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   backdropTop: { justifyContent: 'flex-start', paddingTop: 72 },
+  backdropBottom: {
+    justifyContent: 'flex-end',
+    paddingHorizontal: 0,
+    paddingBottom: 0,
+    paddingTop: 0,
+  },
   card: {
     width: '100%',
     backgroundColor: colors.panel,
@@ -110,6 +133,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.45,
     shadowRadius: 48,
     elevation: 24,
+  },
+  cardBottom: {
+    width: '100%',
+    maxHeight: '88%',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   accent: { height: 3, opacity: 0.9 },
   header: {

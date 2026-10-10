@@ -14,7 +14,14 @@ import type { BuilderState } from './useBuilderState';
 
 const MOTION_CHOICES = ['None', ...MOTIONS.map((m) => m.name)];
 
-export function Inspector({ builder }: { builder: BuilderState }) {
+export function Inspector({
+  builder,
+  variant = 'panel',
+}: {
+  builder: BuilderState;
+  /** Sheet mode hides the panel header (ModalShell already shows it). */
+  variant?: 'panel' | 'sheet';
+}) {
   const player = builder.selectedPlayer;
   const label = player?.label ?? '—';
   const position = player?.position ?? (builder.side === 'def' ? 'Defender' : 'Receiver');
@@ -94,14 +101,22 @@ export function Inspector({ builder }: { builder: BuilderState }) {
   }, [player, hasRoute, route, blockOpt, builder.draftDepth]);
 
   return (
-    <View style={styles.wrap}>
-      <Eyebrow>Assignment</Eyebrow>
-      <Text style={styles.title}>
-        {label} {position}
-      </Text>
-      <Text style={styles.sub}>
-        {role === 'receiver' ? 'Set the route and motion.' : 'Set the assignment.'}
-      </Text>
+    <View style={[styles.wrap, variant === 'sheet' && styles.wrapSheet]}>
+      {variant === 'panel' ? (
+        <>
+          <Eyebrow>Assignment</Eyebrow>
+          <Text style={styles.title}>
+            {label} {position}
+          </Text>
+          <Text style={styles.sub}>
+            {role === 'receiver' ? 'Set the route and motion.' : 'Set the assignment.'}
+          </Text>
+        </>
+      ) : (
+        <Text style={styles.sub}>
+          {role === 'receiver' ? 'Set the route and motion.' : 'Set the assignment.'}
+        </Text>
+      )}
 
       <View style={styles.preview}>
         {previewScene ? (
@@ -214,6 +229,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     backgroundColor: '#171d1a',
     flex: 1,
+  },
+  wrapSheet: {
+    paddingTop: 8,
+    paddingBottom: 16,
+    backgroundColor: 'transparent',
   },
   title: {
     marginTop: 5,
