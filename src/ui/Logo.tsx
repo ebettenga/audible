@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { colors, typography } from '@/src/design';
+
+const logoMark = require('../../assets/images/logo-mark.png');
 
 export function Logo({
   showWordmark = true,
@@ -11,11 +13,11 @@ export function Logo({
 }) {
   const content = (
     <View style={styles.wrap} accessibilityLabel="Audible home">
-      <View style={styles.mark}>
-        <View style={[styles.bar, { height: 15 }]} />
-        <View style={[styles.bar, { height: 24 }]} />
-        <View style={[styles.bar, { height: 19 }]} />
-      </View>
+      <Image
+        source={logoMark}
+        style={[styles.mark, !showWordmark && styles.markCompact]}
+        accessibilityIgnoresInvertColors
+      />
       {showWordmark ? <Text style={styles.type}>AUDIBLE</Text> : null}
     </View>
   );
@@ -28,14 +30,15 @@ export function Logo({
 const styles = StyleSheet.create({
   wrap: { flexDirection: 'row', alignItems: 'center', gap: 11, minWidth: 40 },
   mark: {
-    width: 26,
-    height: 27,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 3,
-    transform: [{ skewX: '-12deg' }],
+    width: 32,
+    height: 32,
+    borderRadius: 8,
   },
-  bar: { width: 6, borderRadius: 2, backgroundColor: colors.lime },
+  markCompact: {
+    width: 36,
+    height: 36,
+    borderRadius: 9,
+  },
   type: {
     fontFamily: typography.fontFamilyBold,
     fontSize: 15,
