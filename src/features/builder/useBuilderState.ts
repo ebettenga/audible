@@ -88,7 +88,7 @@ export function useBuilderState() {
   const [nameDirty, setNameDirty] = useState(false);
   const [notes, setNotes] = useState('');
   const [coachingPoint, setCoachingPoint] = useState('');
-  const [selectedSlot, setSelectedSlot] = useState<string | null>('z');
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [assignments, setAssignments] = useState<Record<string, AssignmentOverride>>({});
   const [routesVisible, setRoutesVisible] = useState(true);
   const [saved, setSaved] = useState(false);
@@ -414,7 +414,7 @@ export function useBuilderState() {
         setDefDraft(next);
         setPlaycall(call);
         setLastValidPlaycall(call);
-        setSelectedSlot('mike');
+        setSelectedSlot(null);
         setPendingRoute(null);
       } else {
         const next = defaultPlaycallDraft();
@@ -422,7 +422,7 @@ export function useBuilderState() {
         setDraft(next);
         setPlaycall(call);
         setLastValidPlaycall(call);
-        setSelectedSlot('z');
+        setSelectedSlot(null);
         setPendingRoute(null);
       }
       setParseError(null);
@@ -585,7 +585,7 @@ export function useBuilderState() {
         setPlaycall(call);
         setLastValidPlaycall(call);
         applyNameFromCall(call);
-        setSelectedSlot('mike');
+        setSelectedSlot(null);
         setPendingRoute(null);
       } else {
         const d = defaultPlaycallDraft();
@@ -594,7 +594,7 @@ export function useBuilderState() {
         setPlaycall(call);
         setLastValidPlaycall(call);
         applyNameFromCall(call);
-        setSelectedSlot('z');
+        setSelectedSlot(null);
         setPendingRoute(null);
       }
       syncSource.current = null;
