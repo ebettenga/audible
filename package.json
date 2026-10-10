@@ -45,7 +45,9 @@
     "web": "expo start --web",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "transcript": "node scripts/youtube-transcript.mjs",
+    "transcript:test": "node --test scripts/youtube-transcript.test.mjs"
   },
   "jest": {
     "preset": "jest-expo",
