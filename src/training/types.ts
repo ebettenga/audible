@@ -226,7 +226,7 @@ export const TOPIC_META: Record<
     color: '#73baf2',
     tone: 'blue',
     icon: 'layers',
-    lessons: 40,
+    lessons: 20,
   },
   'play-calls': {
     title: 'Play Calls',
