@@ -8,11 +8,14 @@ A playcall string such as `I Right 999 Y-Pop` is parsed against dictionaries of 
 
 ## Install on Android (APK)
 
-Download the latest APK from [`releases/audible-1.0.0.apk`](./releases/audible-1.0.0.apk) (arm64 phone build).
+On your phone, open this download page (not the GitHub file view — Chrome often stalls there at 100%):
 
-1. On your phone: Settings → allow installs from this source / unknown apps for your browser or Files.
-2. Open the APK and install.
-3. Launch **Audible** — Packers + Bears seeds load automatically.
+**https://download-production-54b0.up.railway.app/**
+
+1. Tap **Download APK** and wait for the notification to say the 45 MB file is complete.
+2. Open the APK from that notification (or Files → Downloads).
+3. Allow installs from this browser if Android asks.
+4. Launch **Audible** — Packers + Bears seeds load automatically.
 
 ## Quick start (dev)
 
