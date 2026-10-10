@@ -233,6 +233,12 @@ describe('playbook / collection modules', () => {
 });
 
 describe('quiz builder', () => {
+  it('does not generate default-right formation strength questions', () => {
+    const cards = generateCards('formations');
+    expect(cards.some((card) => card.id.startsWith('formation-strength-'))).toBe(false);
+    expect(cards.some((card) => /declared strength/i.test(card.prompt))).toBe(false);
+  });
+
   it('builds n questions with choices', () => {
     const quiz = buildQuiz(['formations'], 4, {}, { seed: 'test-seed' });
     expect(quiz.length).toBeLessThanOrEqual(4);

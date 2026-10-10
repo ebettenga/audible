@@ -214,7 +214,7 @@ export const TOPIC_META: Record<
 > = {
   personnel: {
     title: 'Personnel',
-    description: 'Master position groups and skill-player labels.',
+    description: 'Master grouping codes and skill-player labels.',
     color: '#c9f25b',
     tone: 'lime',
     icon: 'users',
@@ -222,11 +222,11 @@ export const TOPIC_META: Record<
   },
   formations: {
     title: 'Formations',
-    description: 'Identify offensive sets before the snap.',
+    description: 'Identify offensive sets and the facts that define them.',
     color: '#73baf2',
     tone: 'blue',
     icon: 'layers',
-    lessons: 40,
+    lessons: 32,
   },
   'play-calls': {
     title: 'Play Calls',

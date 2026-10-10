@@ -7,6 +7,7 @@ import { FRONTS } from '@/src/data/fronts';
 import { PRESSURES } from '@/src/data/pressures';
 import { CONCEPTS } from '@/src/data/concepts';
 import { PERSONNEL, sceneForPersonnel } from '@/src/data/personnel';
+import { factsForTopic } from '@/src/data/quizFacts';
 import { buildPlay, buildDefense, parsePlaycall } from '@/src/core/parser';
 import type { Collection, FlashCard, Playbook, PlaybookPlay, TrainingTopic } from './types';
 import {
@@ -101,6 +102,20 @@ export function cardsForLearn(book: Playbook | undefined | null, topic?: Trainin
   ];
 }
 
+function factCards(topic: TrainingTopic): FlashCard[] {
+  return factsForTopic(topic).map((fact) => ({
+    id: `fact-${fact.id}`,
+    topic: fact.topic,
+    type: fact.type,
+    prompt: fact.prompt,
+    answer: fact.answer,
+    distractors: fact.distractors,
+    explain: fact.explain,
+    group: fact.group ?? fact.id,
+    hideTitle: true,
+  }));
+}
+
 function personnelCards(): FlashCard[] {
   const codes = PERSONNEL.map((p) => p.code);
   const cards: FlashCard[] = [];
@@ -136,7 +151,7 @@ function personnelCards(): FlashCard[] {
       resolveOptions: { includeDefense: false },
     });
   }
-  return cards;
+  return [...cards, ...factCards('personnel')];
 }
 
 function sceneFromFormation(formationId: string, title: string): PlayScene {
@@ -209,25 +224,8 @@ function formationCards(ctx?: CardContext): FlashCard[] {
       hideTitle: true,
       resolveOptions: { includeDefense: false },
     });
-    const strength = f.strength ?? 'right';
-    cards.push({
-      id: `formation-strength-${f.id}`,
-      topic: 'formations',
-      type: 'name-formation',
-      prompt: `What is the declared strength of ${f.name}?`,
-      answer: strength === 'balanced' ? 'Balanced' : strength === 'left' ? 'Left' : 'Right',
-      distractors: pickDistractors(
-        strength === 'balanced' ? 'Balanced' : strength === 'left' ? 'Left' : 'Right',
-        ['Right', 'Left', 'Balanced'],
-      ),
-      scene,
-      explain: `${f.name} is authored ${strength}${f.description ? ` — ${f.description}` : '.'}`,
-      group: f.id,
-      hideTitle: true,
-      resolveOptions: { includeDefense: false },
-    });
   }
-  return cards;
+  return [...cards, ...factCards('formations')];
 }
 
 function playcallCards(ctx?: CardContext): FlashCard[] {
@@ -292,7 +290,7 @@ function runningRouteCards(): FlashCard[] {
       resolveOptions: { includeDefense: false },
     });
   }
-  return cards;
+  return [...cards, ...factCards('running-routes')];
 }
 
 function passingRouteCards(): FlashCard[] {
@@ -371,7 +369,7 @@ function passingRouteCards(): FlashCard[] {
       });
     }
   }
-  return cards;
+  return [...cards, ...factCards('passing-routes')];
 }
 
 /** Coverage shell that actually paints this zone on the field. */
@@ -548,7 +546,7 @@ function coverageCards(): FlashCard[] {
       });
     }
   }
-  return cards;
+  return [...cards, ...factCards('coverages')];
 }
 
 function frontCards(): FlashCard[] {
@@ -595,13 +593,13 @@ function frontCards(): FlashCard[] {
       });
     }
   }
-  return cards;
+  return [...cards, ...factCards('fronts')];
 }
 
 function pressureCards(): FlashCard[] {
   const list = PRESSURES.filter((p) => p.id !== 'base');
   const names = list.map((p) => p.name);
-  return list.map((p) => {
+  const cards: FlashCard[] = list.map((p) => {
     let scene: PlayScene | undefined;
     try {
       scene = buildDefense(`4-3 Cover 1 ${p.name}`, {
@@ -626,6 +624,7 @@ function pressureCards(): FlashCard[] {
       resolveOptions: { frontId: '4-3', coverageId: 'cover-1', includeDefense: true },
     };
   });
+  return [...cards, ...factCards('pressures')];
 }
 
 function defenderAssignmentCards(): FlashCard[] {
