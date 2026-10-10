@@ -1,7 +1,7 @@
 const APK_URL =
-  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=df0dd16";
+  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=120d104";
 const FILENAME = "audible-1.0.0.apk";
-const BUILD_LABEL = "1.0.1 (main @ df0dd16)";
+const BUILD_LABEL = "1.0.2 (main @ 120d104)";
 
 const PAGE = `<!doctype html>
 <html>
@@ -20,7 +20,7 @@ const PAGE = `<!doctype html>
 <body>
   <main>
     <h1>Audible</h1>
-    <p>Build <code>${BUILD_LABEL}</code>: scheme play-call quiz bank, playbook swipe between plays, multi-select view, and install quizzes with runs. Uninstall the old APK first if the installer says the same app is already installed. Tap download, wait until complete, then open the APK.</p>
+    <p>Build <code>${BUILD_LABEL}</code>: clearer Learn pressure and defender diagrams, play-call quizzes match the diagram, single coaching point on play view, mobile builder assignment sheet. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
     <a href="/audible-1.0.0.apk">Download APK</a>
   </main>
 </body>
@@ -44,7 +44,7 @@ export default {
     if (path === "/audible-1.0.0.apk" || path === "/download") {
       try {
         const body = await apkBytes();
-        return new Response(body, {
+        return new Response(body.buffer as ArrayBuffer, {
           status: 200,
           headers: {
             "Content-Type": "application/vnd.android.package-archive",
