@@ -71,7 +71,7 @@ export function Inspector({
     if (!hasRoute) {
       return {
         title: '',
-        players: [{ ...player, highlight: true }],
+        players: [{ ...player, x: 0, y: 0, highlight: true }],
         arrows: [],
         zones: [],
         annotations: [],
@@ -84,6 +84,10 @@ export function Inspector({
       player.side === 'off'
         ? motionOriginForSnap(offensePlayers, builder.motion, callStrength)
         : undefined;
+    const snapOrigin =
+      motionOrigin && motionOrigin.slot === player.slot
+        ? { x: motionOrigin.x, y: motionOrigin.y }
+        : { x: player.x, y: player.y };
     const depth = builder.choiceUsesDepth ? builder.draftDepth : undefined;
     const relative = blockOpt
       ? blockOpt.path
@@ -95,7 +99,7 @@ export function Inspector({
             { x: 0, y: 0 },
             { x: 0, y: depth ?? 8 },
           ];
-    const points = blockOpt
+    const fieldPoints = blockOpt
       ? (() => {
           const origin =
             motionOrigin && motionOrigin.slot === player.slot
@@ -104,9 +108,13 @@ export function Inspector({
           return absolutePathPoints(origin.x, origin.y, relative, origin.strength);
         })()
       : buildRoutePointsForPlayer(player, relative, callStrength, motionOrigin);
+    const points = fieldPoints.map((p) => ({
+      x: p.x - snapOrigin.x,
+      y: p.y - snapOrigin.y,
+    }));
     return {
       title: '',
-      players: [{ ...player, highlight: true }],
+      players: [{ ...player, x: 0, y: 0, highlight: true }],
       arrows: [
         {
           id: 'preview',
