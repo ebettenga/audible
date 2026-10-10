@@ -79,7 +79,7 @@ export function Inspector({
       };
     }
     const callStrength = builder.strength;
-    const offensePlayers = builder.scene.players.filter((p) => p.side === 'off');
+    const offensePlayers = (builder.scene?.players ?? []).filter((p) => p.side === 'off');
     const motionOrigin =
       player.side === 'off'
         ? motionOriginForSnap(offensePlayers, builder.motion, callStrength)
@@ -130,7 +130,7 @@ export function Inspector({
     builder.choiceUsesDepth,
     builder.strength,
     builder.motion,
-    builder.scene.players,
+    builder.scene,
   ]);
 
   return (

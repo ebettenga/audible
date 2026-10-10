@@ -227,18 +227,6 @@ export function useBuilderState() {
     };
   }, []);
 
-  /** Match break-depth slider to the player's live route when they have no saved override depth. */
-  useEffect(() => {
-    if (!selectedSlot || side !== 'off') return;
-    if (assignments[selectedSlot]?.depth != null) return;
-    const p = scene.players.find((pl) => pl.slot === selectedSlot && pl.side === 'off');
-    if (!p) return;
-    const arrow = scene.arrows.find((a) => a.playerId === p.id && a.kind !== 'motion');
-    const token = arrow?.label?.split(' / ')[0] ?? '';
-    const def = findRouteByName(token);
-    if (def?.defaultDepth != null) setDraftDepth(def.defaultDepth);
-  }, [selectedSlot, side, assignments, scene.players, scene.arrows]);
-
   const setName = useCallback((value: string) => {
     setNameState(value);
     setNameDirty(true);
@@ -286,6 +274,18 @@ export function useBuilderState() {
     defDraft.strength,
     assignments,
   ]);
+
+  /** Match break-depth slider to the player's live route when they have no saved override depth. */
+  useEffect(() => {
+    if (!selectedSlot || side !== 'off') return;
+    if (assignments[selectedSlot]?.depth != null) return;
+    const p = scene.players.find((pl) => pl.slot === selectedSlot && pl.side === 'off');
+    if (!p) return;
+    const arrow = scene.arrows.find((a) => a.playerId === p.id && a.kind !== 'motion');
+    const token = arrow?.label?.split(' / ')[0] ?? '';
+    const def = findRouteByName(token);
+    if (def?.defaultDepth != null) setDraftDepth(def.defaultDepth);
+  }, [selectedSlot, side, assignments, scene]);
 
   const selectedPlayer = useMemo(() => {
     const wantSide = side === 'def' ? 'def' : 'off';
