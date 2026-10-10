@@ -14,7 +14,7 @@
     "android": {
       "package": "com.ebettenga.audible",
       "adaptiveIcon": {
-        "backgroundColor": "#0b4d2e",
+        "backgroundColor": "#0d1110",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -33,7 +33,7 @@
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#0d1110"
         }
       ],
       "expo-font",
