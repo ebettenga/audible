@@ -42,6 +42,7 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 **Possible capabilities:**
 
 - Roster: players, roles, optional groups (e.g. position groups).
+- **Position assignment** per player (primary/secondary); feeds [positional learning (6)](#6-positional-learning-coach-curated).
 - Assignments: “install” or collection assigned to individuals or the whole team with due dates.
 - Knowledge dashboard: per-player SRS / quiz performance, plays marked weak or overdue, team-wide heatmaps by concept or formation.
 - Coach actions: assign remedial sets, pin priority plays, notes visible to staff (not necessarily to all players).
@@ -80,6 +81,22 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 ---
 
+## 6. Positional learning (coach-curated)
+
+**Goal:** Coaches assign each player a **position** (or multiple), and the player gets a **learning section** curated to the understanding that role requires — not the full playbook generic view.
+
+**Possible capabilities:**
+
+- Coach sets position on roster (e.g. QB, Z, Mike LB, nickel); optional depth chart or side of ball (offense/defense/ST).
+- **Position learning home:** topic tiles and drills filtered by role — assignments, reads, landmarks, route tree slice, front/ coverage responsibilities, etc.
+- Tie installs to position: same team play, different emphasis (WR sees routes/tags; OL sees protection and calls; DB sees coverage rules and keys).
+- Progress scoped by position competencies (e.g. “Mike: run fits weak”, “Z: option routes overdue”) visible to coach in (3).
+- Player can still browse full playbook when allowed; default Train/Learn path follows assigned position.
+
+**Dependencies / notes:** Needs a position → curriculum map (metadata on plays/concepts and existing Train topics). Overlaps heavily with (3) for assignment and (5) for self-serve fans who pick a position without a coach. Can prototype on-device with a single coach managing a local roster before sync.
+
+---
+
 ## Suggested sequencing (informal)
 
 | Phase | Focus | Rationale |
@@ -87,7 +104,7 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 | A | Personal mode shell + pro playbook compare (2, 5 lite) | Extends current local app; no backend |
 | B | Playbook matchup analysis (1) | Needs classification/metrics on existing plays |
 | C | On-device game log + analytics (4 lite) | Value before sync |
-| D | Team management + sync (3) + full analytics (4) | Backend and permissions |
+| D | Team management + sync (3), positional learning (6), full analytics (4) | Backend, roster, and position curriculum |
 
 ---
 
