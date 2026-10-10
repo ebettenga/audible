@@ -1,7 +1,7 @@
 const APK_URL =
-  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=71c81c6";
+  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=df0dd16";
 const FILENAME = "audible-1.0.0.apk";
-const BUILD_LABEL = "1.0.1 (main @ 71c81c6)";
+const BUILD_LABEL = "1.0.1 (main @ df0dd16)";
 
 const PAGE = `<!doctype html>
 <html>
