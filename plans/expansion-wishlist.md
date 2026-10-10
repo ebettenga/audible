@@ -115,6 +115,26 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 ---
 
+## 8. Admin views, permissions, and play review
+
+**Goal:** **Students/players** see a learning-focused app (Learn, assigned playbook views, Playground where appropriate) while **Build** and **Team** are **coach/admin-only** tabs, gated by a **permission system**. Staff can be granted scoped abilities (e.g. add offensive or defensive plays) with an optional **review workflow** before content reaches the team install.
+
+**Possible capabilities:**
+
+- **Role model:** at minimum `student`, `coach`, `admin` (head coach / program admin); optional custom staff titles mapped to permission bundles.
+- **Tab & route visibility:** hide **Build** (play builder / `index` tab today) for students; hide **Team** (roster, assignments, analytics — when shipped) unless the user has team-admin permission. Deep links to builder or team routes redirect or show “not available for your role”.
+- **Granular coach permissions** (assignable by admin):
+  - View vs edit playbook / collections
+  - **Add offensive plays** vs **add defensive plays** (side-of-ball scoped create)
+  - Publish directly vs **submit for review** only
+  - Manage roster, assign learning packs, view all player progress vs position group only
+- **Review process:** submitted plays/edits enter a queue; reviewers (admin or designated coordinators) approve, request changes, or reject; approved items merge into the shared team playbook; students never see draft/submitted-unapproved content.
+- **Audit trail:** who created/changed/approved a play (ties to play detail Activity concept).
+
+**Dependencies / notes:** Requires authenticated team membership and server-side (or synced) policy enforcement — hiding tabs in the client alone is not sufficient. Overlaps (3) for Team tab, existing Play Builder for Build tab, and playbook storage today (local-only). Personal mode (5) treats the user as self-admin with full Build access unless they join a team as a student.
+
+---
+
 ## Suggested sequencing (informal)
 
 | Phase | Focus | Rationale |
@@ -122,7 +142,7 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 | A | Personal mode shell + pro playbook compare (2, 5 lite) | Extends current local app; no backend |
 | B | Playbook matchup analysis (1) | Needs classification/metrics on existing plays |
 | C | On-device game log + analytics (4 lite), manual weekly learning packs (7 lite) | Value before sync; coach-built collections per opponent |
-| D | Team management + sync (3), positional learning (6), weekly scheme learning (7), full analytics (4) | Backend, roster, schedule, and curated game-week content |
+| D | Team management + sync (3), roles/permissions + admin tabs (8), positional learning (6), weekly scheme learning (7), full analytics (4) | Backend, roster, schedule, RBAC, and curated game-week content |
 
 ---
 
