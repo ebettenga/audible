@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { Stack, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FieldCanvas } from '@/src/render';
 import {
   getCardScene,
@@ -69,6 +70,9 @@ export function QuizSession({
   const [startedAt] = useState(() => Date.now());
   const { width } = useWindowDimensions();
   const wide = width >= 900;
+  const insets = useSafeAreaInsets();
+  const topInset = Platform.OS === 'web' ? 0 : insets.top;
+  const bottomInset = Platform.OS === 'web' ? 0 : insets.bottom;
 
   const question = questions[index];
   const locked = selected !== null;
@@ -195,7 +199,13 @@ export function QuizSession({
       best = Math.max(best, run);
     }
     return (
-      <ScrollView style={styles.screen} contentContainerStyle={styles.completeWrap}>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={[
+          styles.completeWrap,
+          { paddingTop: topInset + 24, paddingBottom: bottomInset + 32 },
+        ]}
+      >
         <Stack.Screen options={{ headerShown: false }} />
         <View style={styles.ringWrap}>
           <ScoreRing value={accuracy} size={150} />
@@ -266,7 +276,7 @@ export function QuizSession({
 
   if (!question || !scene) {
     return (
-      <View style={[styles.screen, styles.loading]}>
+      <View style={[styles.screen, styles.loading, { paddingTop: topInset }]}>
         <Stack.Screen options={{ headerShown: false }} />
         <Text style={styles.loadingText}>Nothing to quiz yet</Text>
       </View>
@@ -281,7 +291,7 @@ export function QuizSession({
   return (
     <View style={styles.screen}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: topInset + 10 }]}>
         <Pressable
           style={styles.close}
           onPress={() => router.back()}
@@ -329,7 +339,11 @@ export function QuizSession({
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.stage, wide && styles.stageWide]}
+        contentContainerStyle={[
+          styles.stage,
+          wide && styles.stageWide,
+          { paddingBottom: bottomInset + 48 },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={[styles.visual, wide && { flex: 1.5 }]}>

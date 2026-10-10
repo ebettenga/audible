@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAudibleFonts } from '@/src/design/fonts';
 import { colors } from '@/src/design';
 
@@ -36,20 +37,22 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <ThemeProvider value={AudibleTheme}>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.bg },
-          headerTintColor: colors.text,
-          contentStyle: { backgroundColor: colors.bg },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="train/[topic]" options={{ title: 'Training' }} />
-        <Stack.Screen name="train/playbook" options={{ title: 'Playbook Drill' }} />
-        <Stack.Screen name="play/[id]" options={{ headerShown: false, title: 'Play' }} />
-        <Stack.Screen name="learn/quiz" options={{ headerShown: false, title: 'Quiz' }} />
-      </Stack>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={AudibleTheme}>
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.bg },
+            headerTintColor: colors.text,
+            contentStyle: { backgroundColor: colors.bg },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="train/[topic]" options={{ title: 'Training' }} />
+          <Stack.Screen name="train/playbook" options={{ title: 'Playbook Drill' }} />
+          <Stack.Screen name="play/[id]" options={{ headerShown: false, title: 'Play' }} />
+          <Stack.Screen name="learn/quiz" options={{ headerShown: false, title: 'Quiz' }} />
+        </Stack>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

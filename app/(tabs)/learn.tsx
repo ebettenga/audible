@@ -227,8 +227,14 @@ export default function LearnScreen() {
     <ScrollView
       ref={scrollRef}
       style={styles.screen}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, isMobile && styles.contentMobile]}
     >
+      {isMobile ? (
+        <View style={styles.mobileQuickRead}>
+          <DailyQuickRead />
+        </View>
+      ) : null}
+
       <View style={[styles.hero, isMobile && styles.heroMobile]}>
         <View style={styles.heroCopy}>
           <Eyebrow>Learning center</Eyebrow>
@@ -378,14 +384,18 @@ export default function LearnScreen() {
           </View>
 
           <Text style={styles.trackLabel}>Offense</Text>
-          <View style={styles.moduleGrid}>
+          <View style={[styles.moduleGrid, isMobile && styles.moduleGridMobile]}>
             {filteredOffense.length === 0 ? (
               <Text style={styles.emptyTrack}>No offense topics match this filter.</Text>
             ) : (
               filteredOffense.map((mod) => (
                 <Pressable
                   key={mod.topic}
-                  style={[styles.module, active === mod.topic && styles.moduleActive]}
+                  style={[
+                    styles.module,
+                    isMobile && styles.moduleMobile,
+                    active === mod.topic && styles.moduleActive,
+                  ]}
                   onPress={() => {
                     setActive(mod.topic);
                     startTopic(mod.topic);
@@ -410,14 +420,18 @@ export default function LearnScreen() {
           </View>
 
           <Text style={[styles.trackLabel, styles.trackLabelSpaced]}>Defense</Text>
-          <View style={styles.moduleGrid}>
+          <View style={[styles.moduleGrid, isMobile && styles.moduleGridMobile]}>
             {filteredDefense.length === 0 ? (
               <Text style={styles.emptyTrack}>No defense topics match this filter.</Text>
             ) : (
               filteredDefense.map((mod) => (
                 <Pressable
                   key={mod.topic}
-                  style={[styles.module, active === mod.topic && styles.moduleActive]}
+                  style={[
+                    styles.module,
+                    isMobile && styles.moduleMobile,
+                    active === mod.topic && styles.moduleActive,
+                  ]}
                   onPress={() => {
                     setActive(mod.topic);
                     startTopic(mod.topic);
@@ -442,13 +456,13 @@ export default function LearnScreen() {
           </View>
 
           <View style={styles.playbooksSection}>
-            <View style={styles.sectionHead}>
-              <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={[styles.sectionHead, isMobile && styles.sectionHeadStacked]}>
+              <View style={styles.sectionHeadCopy}>
                 <Eyebrow>Your playbooks</Eyebrow>
                 <Text style={styles.sectionTitle}>Drill installs & collections</Text>
               </View>
               {books.length > 0 ? (
-                <View style={styles.bookPicker}>
+                <View style={[styles.bookPicker, isMobile && styles.bookPickerMobile]}>
                   <Select
                     label="Active playbook"
                     value={book?.name ?? books[0]?.name ?? ''}
@@ -461,7 +475,7 @@ export default function LearnScreen() {
             {playbookModules.length === 0 ? (
               <Text style={styles.emptyPlaybooks}>Add plays in the Playbook tab.</Text>
             ) : (
-              <View style={styles.moduleGrid}>
+              <View style={[styles.moduleGrid, isMobile && styles.moduleGridMobile]}>
                 {playbookModules.map((mod, index) => {
                   const key =
                     mod.kind === 'playbook'
@@ -473,6 +487,7 @@ export default function LearnScreen() {
                       key={key}
                       style={[
                         styles.module,
+                        isMobile && styles.moduleMobile,
                         mod.kind === 'collection' && styles.collectionModule,
                         disabled && styles.moduleDisabled,
                       ]}
@@ -553,8 +568,7 @@ export default function LearnScreen() {
             </View>
           </View>
         ) : (
-          <View style={{ marginTop: 20, gap: 13 }}>
-            <DailyQuickRead />
+          <View style={styles.mobileMasteryWrap}>
             <Pressable
               style={styles.mastery}
               onPress={() => router.push('/learn/report')}
@@ -572,6 +586,9 @@ export default function LearnScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 32, paddingBottom: 70 },
+  contentMobile: { paddingHorizontal: 16, paddingTop: 16 },
+  mobileQuickRead: { marginBottom: 20 },
+  mobileMasteryWrap: { marginTop: 20, gap: 13 },
   hero: { flexDirection: 'row', gap: 48, alignItems: 'center', maxWidth: 1380 },
   heroMobile: { flexDirection: 'column', gap: 24 },
   heroCopy: { flex: 1.25 },
@@ -681,6 +698,11 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     flexWrap: 'wrap',
   },
+  sectionHeadStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  sectionHeadCopy: { flex: 1, minWidth: 0, alignSelf: 'stretch' },
   sectionTitle: {
     marginTop: 4,
     fontSize: 24,
@@ -716,6 +738,7 @@ const styles = StyleSheet.create({
   pillText: { color: colors.muted, fontSize: 11, fontWeight: '700' },
   pillTextActive: { color: '#172014' },
   moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  moduleGridMobile: { flexDirection: 'column' },
   module: {
     width: '31%',
     minWidth: 200,
@@ -726,6 +749,12 @@ const styles = StyleSheet.create({
     borderColor: '#2e3631',
     borderRadius: 14,
     backgroundColor: '#151a18',
+  },
+  moduleMobile: {
+    width: '100%',
+    minWidth: 0,
+    maxWidth: '100%',
+    alignSelf: 'stretch',
   },
   moduleActive: { borderColor: '#586357', backgroundColor: '#19201c' },
   moduleIcon: {
@@ -762,6 +791,13 @@ const styles = StyleSheet.create({
   lessons: { color: '#667069', fontSize: 10 },
   playbooksSection: { marginTop: 32 },
   bookPicker: { minWidth: 200, maxWidth: 280, flexGrow: 1 },
+  bookPickerMobile: {
+    width: '100%',
+    minWidth: 0,
+    maxWidth: '100%',
+    flexGrow: 0,
+    marginTop: 4,
+  },
   collectionModule: { marginLeft: 8, borderStyle: 'dashed' },
   moduleDisabled: { opacity: 0.55 },
   emptyPlaybooks: { color: '#7e8881', fontSize: 13, paddingVertical: 8 },
