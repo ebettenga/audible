@@ -46,8 +46,9 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 - Assignments: “install” or collection assigned to individuals or the whole team with due dates; **game-week learning packs** for upcoming opponents (see [7](#7-weekly-game-prep-learning-offense--defense-schemes)).
 - Knowledge dashboard: per-player SRS / quiz performance, plays marked weak or overdue, team-wide heatmaps by concept or formation.
 - Coach actions: assign remedial sets, pin priority plays, notes visible to staff (not necessarily to all players).
+- **Staff roles and permissions** — see [admin views & permissions (8)](#8-admin-views-permissions-and-play-review).
 
-**Dependencies / notes:** Likely needs sync/auth and a backend (or team invite + shared storage). Today the app explicitly avoids team/collab without backend; this item is the main driver for that infrastructure.
+**Dependencies / notes:** Likely needs sync/auth and a backend (or team invite + shared storage). Today the app explicitly avoids team/collab without backend; this item is the main driver for that infrastructure. Player/student UX should hide coach-only surfaces per (8).
 
 ---
 

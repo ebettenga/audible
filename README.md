@@ -66,4 +66,4 @@ Examples:
 
 ## Future expansion (wish list)
 
-Product ideas for later phases (matchup comparison, coach team management, positional and weekly game-prep learning, stats/analytics, personal/fan mode) are captured in [plans/expansion-wishlist.md](./plans/expansion-wishlist.md).
+Product ideas for later phases (matchup comparison, coach team management, role-based Build/Team admin views, positional and weekly game-prep learning, stats/analytics, personal/fan mode) are captured in [plans/expansion-wishlist.md](./plans/expansion-wishlist.md).
