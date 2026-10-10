@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Platform, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FieldCanvas } from '@/src/render';
-import { Button, KeyHint } from '@/src/ui';
+import { Button, KeyHint, ModalShell } from '@/src/ui';
 import { colors, typography, radius, shadows, useBreakpoint } from '@/src/design';
 import { Inspector } from './Inspector';
 import { CallControls } from './CallControls';
@@ -22,7 +22,12 @@ export function PlayBuilder({
   const router = useRouter();
   const { isDesktop, isMobile } = useBreakpoint();
   const showSideInspector = isDesktop;
-  const showBelowInspector = !isDesktop && !!builder.selectedSlot;
+  const showMobileAssignmentSheet = !isDesktop && !!builder.selectedSlot;
+  const assignmentTitle = builder.selectedPlayer
+    ? `${builder.selectedPlayer.label ?? 'Player'} · ${
+        builder.selectedPlayer.position ?? (builder.side === 'def' ? 'Defender' : 'Receiver')
+      }`
+    : 'Assignment';
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
@@ -101,10 +106,26 @@ export function PlayBuilder({
         ) : null}
       </View>
 
-      {showBelowInspector ? (
-        <View style={styles.inspectorBelow}>
-          <Inspector builder={builder} />
-        </View>
+      {showMobileAssignmentSheet ? (
+        <ModalShell
+          visible
+          onClose={() => builder.selectPlayer(null)}
+          title={assignmentTitle}
+          subtitle="Set the assignment, then apply to this play."
+          icon="grid"
+          align="bottom"
+          flush
+          maxWidth={720}
+        >
+          <ScrollView
+            style={styles.mobileSheetScroll}
+            contentContainerStyle={styles.mobileSheetScrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <Inspector builder={builder} variant="sheet" />
+          </ScrollView>
+        </ModalShell>
       ) : null}
 
       <View style={styles.footer}>
@@ -181,13 +202,8 @@ const styles = StyleSheet.create({
   workspaceStack: { flexDirection: 'column', minHeight: 480 },
   fieldCard: { flex: 1, minWidth: 0, borderRightWidth: 1, borderRightColor: colors.borderStrong },
   inspectorCol: { width: 240 },
-  inspectorBelow: {
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: radius.xxl,
-    overflow: 'hidden',
-  },
+  mobileSheetScroll: { maxHeight: 520 },
+  mobileSheetScrollContent: { paddingBottom: 8 },
   footer: {
     height: 53,
     flexDirection: 'row',

@@ -63,6 +63,8 @@ export interface FlashCard {
     coverageId?: string;
     frontId?: string;
     includeDefense?: boolean;
+    /** Ghost offense for defensive play diagrams (playbook cards). */
+    vsPlaycall?: string;
     /** When set, getCardScene keeps / highlights only this zone. */
     highlightZoneId?: string;
   };

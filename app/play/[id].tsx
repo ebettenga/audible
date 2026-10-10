@@ -604,23 +604,21 @@ export default function PlayDetailScreen() {
                   {notes || 'No notes yet. Edit the play to add coaching notes.'}
                 </Text>
               )}
-              <Text style={[styles.fieldLabel, { marginTop: 12 }]}>Coaching point</Text>
               {isEditing ? (
-                <TextInput
-                  value={coachingPoint}
-                  onChangeText={(v) => {
-                    setCoachingPoint(v);
-                    markDirty();
-                  }}
-                  placeholder="One-line coaching point"
-                  placeholderTextColor={colors.faint}
-                  style={styles.input}
-                />
-              ) : (
-                <Text style={styles.notesBody}>
-                  {coachingPoint || 'No coaching point set.'}
-                </Text>
-              )}
+                <>
+                  <Text style={[styles.fieldLabel, { marginTop: 12 }]}>Coaching point</Text>
+                  <TextInput
+                    value={coachingPoint}
+                    onChangeText={(v) => {
+                      setCoachingPoint(v);
+                      markDirty();
+                    }}
+                    placeholder="One-line coaching point"
+                    placeholderTextColor={colors.faint}
+                    style={styles.input}
+                  />
+                </>
+              ) : null}
             </View>
           ) : null}
 
@@ -650,14 +648,16 @@ export default function PlayDetailScreen() {
         </View>
       </View>
 
-      <View style={styles.footer}>
-        <View style={{ flex: 1 }}>
-          <Eyebrow>Coaching point</Eyebrow>
-          <Text style={styles.footerCopy}>
-            {coachingPoint || play.coachingPoint || 'Add a coaching point when you edit this play.'}
-          </Text>
+      {!isEditing ? (
+        <View style={styles.footer}>
+          <View style={{ flex: 1 }}>
+            <Eyebrow>Coaching point</Eyebrow>
+            <Text style={styles.footerCopy}>
+              {coachingPoint || play.coachingPoint || 'Add a coaching point when you edit this play.'}
+            </Text>
+          </View>
         </View>
-      </View>
+      ) : null}
 
       <Modal
         visible={confirmDelete}

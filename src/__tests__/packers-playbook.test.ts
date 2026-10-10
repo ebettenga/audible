@@ -8,7 +8,10 @@ import {
 import {
   activeCollection,
   cardsForLearn,
+  generateCards,
+  getCardScene,
   playsForLearn,
+  playsForScope,
 } from '@/src/training/cards';
 import {
   defaultPlaybook,
@@ -84,6 +87,31 @@ describe('Packers 2026 west-coast seed', () => {
     }
     // Answers are teaching names, not raw playcalls
     expect(answers).not.toContain(install[0].playcall);
+    expect(answers).not.toContain('Cover 3 Buzz');
+  });
+
+  it('play-call identify cards match each play’s own diagram', () => {
+    const book = buildPackersPlaybook();
+    const cards = cardsForLearn(book, 'play-calls').filter((c) => c.id.startsWith('playbook-'));
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards) {
+      expect(card.scene).toBeTruthy();
+      const scene = getCardScene(card);
+      expect(scene.title).toBe('');
+      const built = buildPlay(card.playcall!, { includeDefense: false });
+      expect(scene.players.filter((p) => p.side === 'off').length).toBe(
+        built.players.filter((p) => p.side === 'off').length,
+      );
+    }
+  });
+
+  it('does not turn defensive installs into Name this play cards', () => {
+    const book = buildPackersPlaybook();
+    const dCollection = book.collections.find((c) => c.id === 'col-packers-d');
+    expect(dCollection).toBeTruthy();
+    const ctx = { plays: playsForScope(book, dCollection!.id) };
+    const cards = generateCards('play-calls', ctx).filter((c) => c.id.startsWith('playbook-'));
+    expect(cards).toHaveLength(0);
   });
 
   it('does not treat Packers seed as legacy Coryell', () => {
