@@ -43,7 +43,7 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 - Roster: players, roles, optional groups (e.g. position groups).
 - **Position assignment** per player (primary/secondary); feeds [positional learning (6)](#6-positional-learning-coach-curated).
-- Assignments: “install” or collection assigned to individuals or the whole team with due dates.
+- Assignments: “install” or collection assigned to individuals or the whole team with due dates; **game-week learning packs** for upcoming opponents (see [7](#7-weekly-game-prep-learning-offense--defense-schemes)).
 - Knowledge dashboard: per-player SRS / quiz performance, plays marked weak or overdue, team-wide heatmaps by concept or formation.
 - Coach actions: assign remedial sets, pin priority plays, notes visible to staff (not necessarily to all players).
 
@@ -59,7 +59,7 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 - Log games (opponent, date, home/away) and drive-level or play-level stats (down/distance, result, personnel, play type).
 - Trend views: success rate by down, red zone, personnel, tendency vs what was trained.
-- Pre-game prep: link opponent tendencies (manual entry or imported) to recommended installs from the playbook library.
+- Pre-game prep: link opponent tendencies (manual entry or imported) to recommended installs from the playbook library; feeds [weekly game-prep learning (7)](#7-weekly-game-prep-learning-offense--defense-schemes).
 - Post-game review: flag plays/concepts that broke down and tie them back to training gaps.
 
 **Dependencies / notes:** Can start on-device only (single coach/team); richer workflows pair with (3) and optional import from spreadsheets or future integrations.
@@ -92,8 +92,25 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 - Tie installs to position: same team play, different emphasis (WR sees routes/tags; OL sees protection and calls; DB sees coverage rules and keys).
 - Progress scoped by position competencies (e.g. “Mike: run fits weak”, “Z: option routes overdue”) visible to coach in (3).
 - Player can still browse full playbook when allowed; default Train/Learn path follows assigned position.
+- During game week, position path prioritizes plays and concepts from the active [weekly learning pack (7)](#7-weekly-game-prep-learning-offense--defense-schemes).
 
 **Dependencies / notes:** Needs a position → curriculum map (metadata on plays/concepts and existing Train topics). Overlaps heavily with (3) for assignment and (5) for self-serve fans who pick a position without a coach. Can prototype on-device with a single coach managing a local roster before sync.
+
+---
+
+## 7. Weekly game-prep learning (offense & defense schemes)
+
+**Goal:** Each week, coaches publish **learning sections** focused on the **offensive and defensive schemes** (and tendency package) the team must understand for the **upcoming opponent** — separate from generic install work and aligned to that game on the schedule.
+
+**Possible capabilities:**
+
+- **Game week object:** opponent, date, home/away; coach selects or builds an opponent schematic profile (fronts, coverages, run/pass looks, key concepts).
+- **Weekly learning pack:** curated modules for offense side (“their defensive looks we must recognize / beat”) and defense side (“their offensive schemes we must defend”), plus special teams if needed.
+- **Learn tab for the week:** dedicated entry point (“Week 6 vs …”) with flashcards, diagram quizzes, and playbook clips tied to those schemes; completion tracking per player and position group.
+- **Auto-suggestions:** derive pack content from playbook comparison (1), opponent playbook library (2), and coach notes; coach edits before publish.
+- **Roll-forward:** after the game, archive the week; tie review items to post-game analytics (4) for “we didn’t know their RPO package” style gaps.
+
+**Dependencies / notes:** Connects schedule/opponent data (4), coach assignments (3), and position-filtered delivery (6). Can start as a manual “weekly collection” template before full opponent modeling.
 
 ---
 
@@ -103,8 +120,8 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 |-------|--------|-----------|
 | A | Personal mode shell + pro playbook compare (2, 5 lite) | Extends current local app; no backend |
 | B | Playbook matchup analysis (1) | Needs classification/metrics on existing plays |
-| C | On-device game log + analytics (4 lite) | Value before sync |
-| D | Team management + sync (3), positional learning (6), full analytics (4) | Backend, roster, and position curriculum |
+| C | On-device game log + analytics (4 lite), manual weekly learning packs (7 lite) | Value before sync; coach-built collections per opponent |
+| D | Team management + sync (3), positional learning (6), weekly scheme learning (7), full analytics (4) | Backend, roster, schedule, and curated game-week content |
 
 ---
 
