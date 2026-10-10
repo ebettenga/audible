@@ -1,16 +1,38 @@
-# Football Flashcards
+# Audible
 
 Deterministic football play builder + flashcard trainer (Expo / React Native).
 
+Defaults to **Packers 2026** (offense + defense) and **Bears 2026** playbooks seeded on device.
+
 A playcall string such as `I Right 999 Y-Pop` is parsed against dictionaries of formations, routes, protections, runs, fronts, and coverages, then resolved into a serializable `PlayScene`. `FieldCanvas` is the shared play drawing surface (turf, LOS, hashes, yard numbers, players, routes, and zones) — same input always yields the same diagram.
 
-## Quick start
+## Install on Android (APK)
+
+Download the latest APK from [`releases/audible-1.0.0.apk`](./releases/audible-1.0.0.apk) (arm64 phone build).
+
+1. On your phone: Settings → allow installs from this source / unknown apps for your browser or Files.
+2. Open the APK and install.
+3. Launch **Audible** — Packers + Bears seeds load automatically.
+
+## Quick start (dev)
 
 ```bash
 npm install
 npm start          # Expo dev server
 npm test           # Golden + unit tests
 npm run typecheck
+```
+
+### Local Android APK rebuild
+
+Requires JDK 17 + Android SDK. Then:
+
+```bash
+export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+export ANDROID_HOME="/opt/homebrew/share/android-commandlinetools"
+npx expo prebuild --platform android
+cd android && ./gradlew app:assembleRelease -PreactNativeArchitectures=arm64-v8a
+# APK: android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ## Playcall grammar
