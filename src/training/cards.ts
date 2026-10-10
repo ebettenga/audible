@@ -7,7 +7,7 @@ import { FRONTS } from '@/src/data/fronts';
 import { PRESSURES } from '@/src/data/pressures';
 import { CONCEPTS } from '@/src/data/concepts';
 import { PERSONNEL, sceneForPersonnel } from '@/src/data/personnel';
-import { factsForTopic, type QuizFact } from '@/src/data/quizFacts';
+import { factsForTopic, type QuizFact } from '@/src/training/quizCache';
 import { buildPlay, buildDefense, parsePlaycall } from '@/src/core/parser';
 import type { Collection, FlashCard, Playbook, PlaybookPlay, TrainingTopic } from './types';
 import {
@@ -513,10 +513,6 @@ function formationCards(ctx?: CardContext): FlashCard[] {
 }
 
 function playcallCards(ctx?: CardContext): FlashCard[] {
-  if (ctx?.plays?.length) {
-    return cardsFromPlaybook(ctx.plays);
-  }
-  // Fallback dictionary samples (west-coast friendly) when no book loaded yet
   const fallback = [
     { id: 'sample-spacing', name: 'Spacing', playcall: 'Gun Doubles Right 62 Spacing' },
     { id: 'sample-mesh', name: 'Mesh', playcall: 'Gun Bunch Right 62 Mesh' },
@@ -524,7 +520,19 @@ function playcallCards(ctx?: CardContext): FlashCard[] {
     { id: 'sample-dagger', name: 'Dagger', playcall: 'Gun Doubles Right 62 Dagger' },
     { id: 'sample-wz', name: 'Wide Zone Rt', playcall: 'Gun Doubles Right Wide Zone' },
   ];
-  return cardsFromPlaybook(fallback);
+  const plays = ctx?.plays?.length ? ctx.plays : fallback;
+  return [...cardsFromPlaybook(plays), ...factCards('play-calls')];
+}
+
+/** Install / collection quiz: playbook plays plus transcript-backed run & pass literacy. */
+export function cardsForInstallQuiz(
+  book: Playbook | undefined | null,
+  collectionId?: string | null,
+): FlashCard[] {
+  const plays = playsForScope(book, collectionId);
+  const ctx: CardContext = { plays, preferInstallFormations: true };
+  const topics: TrainingTopic[] = ['play-calls', 'running-routes', 'passing-routes'];
+  return topics.flatMap((topic) => generateCards(topic, ctx));
 }
 
 function runningRouteCards(): FlashCard[] {

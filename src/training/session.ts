@@ -1,4 +1,4 @@
-import type { CardProgress, FlashCard } from './types';
+import type { CardProgress, FlashCard, TrainingTopic } from './types';
 import { isDue } from './srs';
 
 export type QuizQuestion = {
@@ -128,7 +128,56 @@ export type BuildSessionOpts = {
   size?: number;
   seed?: string;
   now?: Date;
+  /** When the pool spans multiple topics, round-robin so runs/pass/etc. are not drowned out. */
+  balanceTopics?: boolean;
 };
+
+function rankCards(
+  cards: FlashCard[],
+  progress: Record<string, CardProgress>,
+  now: Date,
+): FlashCard[] {
+  return [...cards].sort((a, b) => {
+    const diff = scoreCard(b, progress, now) - scoreCard(a, progress, now);
+    if (diff !== 0) return diff;
+    return a.id.localeCompare(b.id);
+  });
+}
+
+function balancedTopicPool(
+  cards: FlashCard[],
+  progress: Record<string, CardProgress>,
+  now: Date,
+  poolSize: number,
+): FlashCard[] {
+  const byTopic = new Map<TrainingTopic, FlashCard[]>();
+  for (const card of cards) {
+    const list = byTopic.get(card.topic) ?? [];
+    list.push(card);
+    byTopic.set(card.topic, list);
+  }
+  const topics = [...byTopic.keys()].sort();
+  if (topics.length <= 1) {
+    return rankCards(cards, progress, now).slice(0, poolSize);
+  }
+
+  const rankedByTopic = topics.map((topic) => rankCards(byTopic.get(topic)!, progress, now));
+  const cursor = topics.map(() => 0);
+  const out: FlashCard[] = [];
+  while (out.length < poolSize) {
+    let progressed = false;
+    for (let ti = 0; ti < topics.length && out.length < poolSize; ti++) {
+      const ranked = rankedByTopic[ti]!;
+      const idx = cursor[ti]!;
+      if (idx >= ranked.length) continue;
+      out.push(ranked[idx]!);
+      cursor[ti] = idx + 1;
+      progressed = true;
+    }
+    if (!progressed) break;
+  }
+  return out;
+}
 
 /**
  * Build a short, shuffled session from a card bank.
@@ -146,14 +195,13 @@ export function buildSession(
 
   if (!cards.length) return [];
 
-  const ranked = [...cards].sort((a, b) => {
-    const diff = scoreCard(b, progress, now) - scoreCard(a, progress, now);
-    if (diff !== 0) return diff;
-    return a.id.localeCompare(b.id);
-  });
-
   const poolSize = Math.min(cards.length, Math.max(size * 3, size));
-  const pool = ranked.slice(0, poolSize);
+  const topicSet = new Set(cards.map((c) => c.topic));
+  const balance =
+    opts.balanceTopics ?? (topicSet.size > 1 && cards.length >= size * 2);
+  const pool = balance
+    ? balancedTopicPool(cards, progress, now, poolSize)
+    : rankCards(cards, progress, now).slice(0, poolSize);
   const interleaved = interleaveByGroup(shuffle(pool, rand), rand);
   const picked = interleaved.slice(0, Math.min(size, interleaved.length));
 

@@ -29,10 +29,13 @@ export function buildQuiz(
       opts?.book ? cardsForLearn(opts.book, t) : generateCards(t),
     );
 
+  const balanceTopics = topics.length > 1 || (opts?.cards && new Set(pool.map((c) => c.topic)).size > 1);
+
   return buildSession(pool, progress, {
     size: n,
     seed: opts?.seed,
     now: opts?.now,
+    balanceTopics,
   });
 }
 

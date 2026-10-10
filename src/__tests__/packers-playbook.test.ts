@@ -75,8 +75,10 @@ describe('Packers 2026 west-coast seed', () => {
     expect(install.every((p) => BEARS_WEEK5_IDS.includes(p.id))).toBe(true);
 
     const cards = cardsForLearn(book, 'play-calls');
-    expect(cards.length).toBe(install.length);
-    const answers = cards.map((c) => c.answer);
+    const playbookCards = cards.filter((c) => c.id.startsWith('playbook-'));
+    expect(playbookCards.length).toBe(install.length);
+    expect(cards.some((c) => c.id.startsWith('fact-'))).toBe(true);
+    const answers = playbookCards.map((c) => c.answer);
     for (const p of install) {
       expect(answers).toContain(p.name);
     }

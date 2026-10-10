@@ -2,11 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import {
   buildQuiz,
-  cardsFromPlaybook,
+  cardsForInstallQuiz,
   loadPlaybooks,
   loadProgress,
   loadSettings,
-  playsForScope,
   resolveActiveBook,
   TOPIC_META,
   type CardProgress,
@@ -75,14 +74,19 @@ export default function QuizScreen() {
           const col = collectionId
             ? resolved.collections?.find((c) => c.id === collectionId)
             : undefined;
-          const cards = cardsFromPlaybook(playsForScope(resolved, collectionId));
+          const cards = cardsForInstallQuiz(resolved, collectionId);
+          const installTopics: TrainingTopic[] = [
+            'play-calls',
+            'running-routes',
+            'passing-routes',
+          ];
           setData({
             progress: map,
             book: resolved,
             scopeCards: cards,
             scopeTitle: col?.name ?? resolved.name,
             bookId: resolved.id,
-            questions: buildQuiz(topicFilter, count, map, { cards }),
+            questions: buildQuiz(installTopics, count, map, { cards }),
           });
         } else {
           const book = resolveActiveBook(books, settings);

@@ -147,6 +147,7 @@ async function getDb() {
       await migrateV5(db);
       await migrateV6(db);
       await migrateV7(db);
+      await migrateV8(db);
       return db;
     })();
   }
@@ -681,6 +682,26 @@ async function migrateV7(db: import('expo-sqlite').SQLiteDatabase) {
   ]);
   await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', [
     'migrated_v7',
+    '1',
+  ]);
+}
+
+/** Quiz question bank in SQLite (seeded from bundled transcript facts). */
+async function migrateV8(db: import('expo-sqlite').SQLiteDatabase) {
+  const migrated = await db.getFirstAsync<{ value: string }>(
+    'SELECT value FROM meta WHERE key = ?',
+    ['migrated_v8'],
+  );
+  if (migrated?.value === '1') {
+    const { refreshQuizFactCache } = await import('./quizDb');
+    await refreshQuizFactCache(db);
+    return;
+  }
+
+  const { refreshQuizFactCache } = await import('./quizDb');
+  await refreshQuizFactCache(db);
+  await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', [
+    'migrated_v8',
     '1',
   ]);
 }

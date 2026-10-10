@@ -1,5 +1,5 @@
 import { FORMATIONS } from '@/src/data/formations';
-import { QUIZ_FACTS, factsForTopic } from '@/src/data/quizFacts';
+import { QUIZ_FACTS, factsForTopic } from '@/src/training/quizCache';
 import { generateCards, getCardScene } from '@/src/training/cards';
 import { buildQuiz } from '@/src/training/quiz';
 import type { TrainingTopic } from '@/src/training/types';
@@ -7,6 +7,7 @@ import type { TrainingTopic } from '@/src/training/types';
 const FACT_TOPICS: TrainingTopic[] = [
   'formations',
   'personnel',
+  'play-calls',
   'passing-routes',
   'running-routes',
   'fronts',
@@ -18,7 +19,7 @@ describe('transcript-backed quiz facts', () => {
   it('covers every Fourth and Film Learn topic with unique, well-formed facts', () => {
     const ids = QUIZ_FACTS.map((fact) => fact.id);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(130);
+    expect(QUIZ_FACTS.length).toBeGreaterThanOrEqual(155);
 
     for (const topic of FACT_TOPICS) {
       const facts = factsForTopic(topic);

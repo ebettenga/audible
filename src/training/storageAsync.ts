@@ -30,6 +30,7 @@ import {
   PACKERS_SEED_VERSION,
   withDerivedInstalls,
 } from './storageSeed';
+import { hydrateQuizFactCache, QUIZ_FACTS_BUNDLED } from './quizCache';
 
 export {
   topicProgressPercent,
@@ -62,6 +63,7 @@ const viewedThisSession = new Set<string>();
 
 function mem(): MemoryState {
   if (!memory) {
+    hydrateQuizFactCache(QUIZ_FACTS_BUNDLED);
     memory = {
       progress: {},
       books: defaultPlaybooks(),

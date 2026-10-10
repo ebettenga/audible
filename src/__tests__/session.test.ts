@@ -95,9 +95,29 @@ describe('buildSession', () => {
   });
 });
 
+describe('topic-balanced sessions', () => {
+  it('mixes running routes into multi-topic quizzes instead of only play calls', () => {
+    const playCalls = generateCards('play-calls');
+    const runs = generateCards('running-routes');
+    const pool = [...playCalls, ...runs];
+    const session = buildSession(pool, {}, {
+      size: 12,
+      seed: 'balance-runs',
+      balanceTopics: true,
+      now: new Date('2026-01-01'),
+    });
+    const topics = new Set(session.map((q) => q.card.topic));
+    expect(topics.has('running-routes')).toBe(true);
+    expect(topics.has('play-calls')).toBe(true);
+    const runCount = session.filter((q) => q.card.topic === 'running-routes').length;
+    expect(runCount).toBeGreaterThanOrEqual(3);
+  });
+});
+
 describe('content depth', () => {
   it('has deeper banks for key topics', () => {
     expect(generateCards('formations').length).toBeGreaterThanOrEqual(18);
+    expect(generateCards('play-calls').length).toBeGreaterThanOrEqual(20);
     expect(generateCards('defender-assignments').length).toBeGreaterThanOrEqual(40);
     expect(generateCards('coverage-reads').length).toBeGreaterThanOrEqual(30);
     expect(generateCards('zones').length).toBeGreaterThanOrEqual(16);

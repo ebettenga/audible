@@ -12,7 +12,7 @@ export interface QuizFact {
   group?: string;
 }
 
-export const QUIZ_FACTS: QuizFact[] = [
+export const QUIZ_CORE_FACTS: QuizFact[] = [
   // --- Formations (Every Offensive Formation Explained) ---
   {
     id: 'form-purpose',
@@ -1909,7 +1909,3 @@ export const QUIZ_FACTS: QuizFact[] = [
     group: 'zero',
   },
 ];
-
-export function factsForTopic(topic: TrainingTopic): QuizFact[] {
-  return QUIZ_FACTS.filter((fact) => fact.topic === topic);
-}
