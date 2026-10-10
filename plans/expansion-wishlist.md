@@ -6,6 +6,43 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 ---
 
+## Product thesis: execution readiness + play intelligence
+
+Audible should organize its roadmap around two questions:
+
+1. **Can our players execute the play?**
+2. **Is the play working, in which contexts, to what extent, and how can we improve it?**
+
+These form one closed learning loop:
+
+> Define the play → teach each position → verify understanding → observe practice/game reps → grade execution → analyze outcomes in context → improve the play or teaching plan → repeat.
+
+### Pillar 1: Can players execute?
+
+Readiness should distinguish three levels instead of treating quiz completion as proof of execution:
+
+- **Knowledge:** can the player identify the call, assignment, read, adjustment, and responsibility?
+- **Practice execution:** can the player perform it correctly at speed against representative looks?
+- **Game execution:** can the player recognize the context and execute under game conditions?
+
+Each play should connect position-specific learning, quiz evidence, coach-graded practice/game reps, mistakes, and film clips. Coordinators should be able to see readiness by player, position group, play, concept, and weekly install.
+
+### Pillar 2: Are plays working?
+
+Play intelligence must separate **design effectiveness** from **execution quality**. A bad outcome does not prove a bad play if an assignment was missed; a good result does not prove a sound design if it depended on a broken tackle.
+
+Every recorded rep should link:
+
+- **Play identity and version:** exact play, tags/checks, and which revision was run.
+- **Context:** practice/game, opponent, down/distance, field zone/hash, score/clock, personnel, formation/motion, and observed front/coverage/pressure.
+- **Outcome:** yards, success/explosive/negative result, score/turnover, pressure, or coach-defined objective.
+- **Execution grades:** assignment, decision/read, technique, timing, and position/player responsible.
+- **Evidence:** film clip, coach notes, and corrections/learning assigned afterward.
+
+Analytics should expose sample size and uncertainty, compare like contexts, and avoid declaring a play “good” or “bad” from a few reps. The useful output is actionable: **keep it, change it, teach it differently, call it only in specific contexts, or remove it.**
+
+---
+
 ## 1. Playbook comparison (matchup analysis)
 
 **Goal:** Compare two playbooks side by side to surface strengths and weaknesses in a hypothetical team-vs-team matchup.
@@ -52,18 +89,22 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 ---
 
-## 4. Stat tracking and game analytics
+## 4. Stat tracking, contextual analytics, and play data mining
 
-**Goal:** **Stat tracking** and an **analytics** section to prepare for upcoming opponents and review past games.
+**Goal:** **Stat tracking** and contextual **play intelligence** that helps coordinators prepare for opponents, review past games, and decide whether a problem comes from the play design, play call, or execution.
 
 **Possible capabilities:**
 
 - Log games (opponent, date, home/away) and drive-level or play-level stats (down/distance, result, personnel, play type).
-- Trend views: success rate by down, red zone, personnel, tendency vs what was trained.
+- Tag every rep with the play/version, situation, offensive and defensive looks, result, execution grade, and linked film.
+- Trend views: success rate by down, field zone, hash, personnel, formation/motion, opponent front/coverage/pressure, and tendency vs what was trained.
+- Compare **all reps** with **correctly executed reps** to expose whether poor results are driven by design/call context or player execution.
+- Slice a play without losing the denominator: attempts, success/explosive/negative rates, yards or expected value where supported, execution score, sample size, and confidence/“not enough data” warnings.
+- Surface actionable findings: best/worst contexts, recurring assignment failures, likely tendency tells, and candidate changes to the play or learning plan.
 - Pre-game prep: link opponent tendencies (manual entry or imported) to recommended installs from the playbook library; feeds [weekly game-prep learning (7)](#7-weekly-game-prep-learning-offense--defense-schemes).
 - Post-game review: flag plays/concepts that broke down and tie them back to training gaps.
 
-**Dependencies / notes:** Can start on-device only (single coach/team); richer workflows pair with (3) and optional import from spreadsheets or future integrations.
+**Dependencies / notes:** Requires stable play IDs/versioning and a shared rep/context/grade model so practice, film, games, learning, and analytics refer to the same play. Start with fast manual tagging and CSV import; automation should assist rather than invent context or grades. Richer workflows pair with (3), film-linked evidence, and optional integrations.
 
 ---
 
@@ -139,9 +180,10 @@ App context: deterministic play builder + flashcard trainer (Expo / React Native
 
 | Phase | Focus | Rationale |
 |-------|--------|-----------|
+| Foundation | Stable play/version IDs + rep/context/execution-grade model + film links | Makes readiness and play analytics trustworthy |
 | A | Personal mode shell + pro playbook compare (2, 5 lite) | Extends current local app; no backend |
 | B | Playbook matchup analysis (1) | Needs classification/metrics on existing plays |
-| C | On-device game log + analytics (4 lite), manual weekly learning packs (7 lite) | Value before sync; coach-built collections per opponent |
+| C | On-device rep grading + contextual analytics (4 lite), manual weekly learning packs (7 lite) | Closes the first execution-to-outcome learning loop |
 | D | Team management + sync (3), roles/permissions + admin tabs (8), positional learning (6), weekly scheme learning (7), full analytics (4) | Backend, roster, schedule, RBAC, and curated game-week content |
 
 ---
