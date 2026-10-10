@@ -63,3 +63,7 @@ Examples:
 1. **Train** — topic tiles (personnel, formations, play calls, routes, zones, coverages, field positions)
 2. **Playground** — live playcall → diagram with defense/coverage toggles
 3. **Playbook** — collections/installs, real FieldCanvas previews, sort/filter, play detail with notes/activity
+
+## Future expansion (wish list)
+
+Product ideas for later phases (matchup comparison, coach team management, stats/analytics, personal/fan mode) are captured in [plans/expansion-wishlist.md](./plans/expansion-wishlist.md).
