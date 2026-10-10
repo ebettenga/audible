@@ -1,7 +1,7 @@
 const APK_URL =
-  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=4f94530";
+  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=4d1e94d";
 const FILENAME = "audible-1.0.0.apk";
-const BUILD_LABEL = "1.0.3 (main @ 4f94530)";
+const BUILD_LABEL = "1.0.4 (main @ 4d1e94d)";
 
 const PAGE = `<!doctype html>
 <html>
@@ -20,7 +20,7 @@ const PAGE = `<!doctype html>
 <body>
   <main>
     <h1>Audible</h1>
-    <p>Build <code>${BUILD_LABEL}</code>: assignment sheet buttons sit above the Android nav bar, plus Learn diagram fixes, play-call quiz diagrams, playbook coaching point cleanup, and mobile builder assignment sheet. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
+    <p>Build <code>${BUILD_LABEL}</code>: assignment route preview matches the main field (mirroring and depth), Android assignment sheet above the nav bar, Learn diagram fixes, play-call quiz diagrams, and mobile builder assignment sheet. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
     <a href="/audible-1.0.0.apk">Download APK</a>
   </main>
 </body>
