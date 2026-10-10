@@ -77,36 +77,51 @@ function interleaveByGroup(cards: FlashCard[], rand: () => number): FlashCard[] 
   return out;
 }
 
+function uniqueAnswers(answer: string, items: string[]): string[] {
+  const answerKey = answer.toLowerCase();
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of items) {
+    const key = item.toLowerCase().trim();
+    if (!key || key === answerKey || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
+/**
+ * Keep every choice answering the same question.
+ * Do not pull other cards' answers from the topic — that turns a
+ * "how deep is Y cross?" item into Mesh / Cover 2 / Ace.
+ */
 function pickSessionDistractors(
   card: FlashCard,
   allCards: FlashCard[],
   rand: () => number,
   count = 3,
 ): string[] {
-  const answerKey = card.answer.toLowerCase();
-  const fromPool = (card.distractorPool ?? []).filter(
-    (d) => d.toLowerCase() !== answerKey,
-  );
-  const fromFamily = allCards
-    .filter((c) => c.group === card.group && c.id !== card.id)
-    .map((c) => c.answer)
-    .filter((a) => a.toLowerCase() !== answerKey);
-  const fromTopic = allCards
-    .filter((c) => c.topic === card.topic && c.id !== card.id)
-    .map((c) => c.answer)
-    .filter((a) => a.toLowerCase() !== answerKey);
-  const fromCard = card.distractors.filter((d) => d.toLowerCase() !== answerKey);
-
-  const seen = new Set<string>();
-  const candidates: string[] = [];
-  for (const d of [...fromPool, ...fromFamily, ...fromCard, ...fromTopic]) {
-    const key = d.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-    candidates.push(d);
+  const fromCard = uniqueAnswers(card.answer, card.distractors);
+  if (fromCard.length >= count) {
+    return shuffle(fromCard, rand).slice(0, count);
   }
 
-  return shuffle(candidates, rand).slice(0, count);
+  const fromPool = uniqueAnswers(card.answer, card.distractorPool ?? []);
+  const preferred = uniqueAnswers(card.answer, [...fromCard, ...fromPool]);
+  if (preferred.length >= count) {
+    return shuffle(preferred, rand).slice(0, count);
+  }
+
+  const peers = allCards
+    .filter(
+      (candidate) =>
+        candidate.id !== card.id &&
+        candidate.topic === card.topic &&
+        candidate.type === card.type &&
+        candidate.prompt === card.prompt,
+    )
+    .map((candidate) => candidate.answer);
+  return shuffle(uniqueAnswers(card.answer, [...preferred, ...peers]), rand).slice(0, count);
 }
 
 export type BuildSessionOpts = {

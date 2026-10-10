@@ -107,8 +107,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'A linebacker often has to cover a faster slot receiver',
     distractors: [
       'The nose tackle must cover the tight end',
-      'The punter must play safety',
-      'The center must release on a wheel',
+      'The free safety must walk down into the box',
+      'The weak-side tackle must split out wide',
     ],
     explain:
       'One back frees a receiver between tackle and wideout. Bring an extra box defender and the slot is open; cover the slot with a DB and the box is light.',
@@ -138,7 +138,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'It cannot run the football at all',
       'The quarterback must stand in shotgun',
-      'It is illegal in the NFL',
+      'Two backs cannot max-protect',
     ],
     explain:
       'A third receiver is worth more than a second back against modern secondaries. Pro set still shows up in short yardage.',
@@ -592,7 +592,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Deep post first, then a sneak',
       'Only the fade, never a checkdown',
-      'The pulling guard',
+      'High to low on the flood side, then the backside post',
     ],
     explain:
       'Throw whoever separates after the two shallows cross. If both are covered, the running back in the flat is the outlet.',
@@ -607,7 +607,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Only the boundary fade',
       'Only the running back in the flat',
-      'The A-gap with a dive',
+      'A single deep post with no underneath route',
     ],
     explain:
       'Levels staggers receivers at different depths so a zone defender who sits on one layer leaves a window at another.',
@@ -649,7 +649,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'Which coverage is the classic weakness of flood?',
     answer: 'Cover 2, because a safety can take the corner route',
-    distractors: ['Cover 3', 'Cover 0 only', 'Goal-line 6-2'],
+    distractors: ['Cover 3', 'Cover 0', 'Cover 1 robber'],
     explain:
       'Flood is built to put three on two in Cover 3. Cover 2 has a deep half safety who can carry the corner; backside pressure also wrecks boot timing.',
     group: 'flood',
@@ -672,9 +672,9 @@ export const QUIZ_FACTS: QuizFact[] = [
     prompt: 'On smash, what tells the quarterback hitch vs corner?',
     answer: 'Cornerback leverage — sits down, throw the corner; drops deep, take the hitch',
     distractors: [
-      'The play clock',
+      'Whether the Mike drops to Tampa 2',
       'Whether the center is covered',
-      'The hash the ball is on only',
+      'Pre-snap motion by the running back only',
     ],
     explain:
       'It is a two-man high-low. The corner cannot be in both places. Tampa 2 is a common counter because the Mike helps the deep middle.',
@@ -697,7 +697,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'Who does the quarterback read first on Y cross?',
     answer: 'The middle-field defender — if he leaves, throw the cross',
-    distractors: ['The punter', 'The backside guard', 'Only the boundary corner'],
+    distractors: ['The boundary corner only', 'The playside tackle', 'The running back in the flat first'],
     explain:
       'If the cross is covered, progress to the deep or outside clear-out. Robbers and deep middle help are the counters.',
     group: 'y-cross',
@@ -737,7 +737,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'On four verticals, what does the quarterback use as the first clue?',
     answer: 'Pre-snap safety alignment — single-high vs two-high',
-    distractors: ['The coin toss', 'Whether the tight end reported eligible', 'The yard-line color'],
+    distractors: ['Corner press vs off alignment only', 'Whether the tight end reported eligible', 'The hash the ball is on only'],
     explain:
       'Single high: work the seams on either side of that safety. Two high: look for the hole between them. Quarters is the counter.',
     group: 'four-verticals',
@@ -748,7 +748,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'On stick, who does the quarterback read first after the snap?',
     answer: 'The flat defender',
-    distractors: ['The free safety', 'The backside guard', 'The boundary corner only'],
+    distractors: ['The free safety', 'The middle linebacker', 'The boundary corner only'],
     explain:
       'If the flat defender widens, throw the 5-yard stick. If he sits on the stick, throw the back in the flat.',
     group: 'stick',
@@ -815,7 +815,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'Double China (two 5-yard ins + a corner) is especially useful where?',
     answer: 'Red zone and short yardage',
-    distractors: ['Kickoff return', 'Punt protection', 'Victory formation'],
+    distractors: ['Opening first-and-10 from midfield', 'Third-and-long from their own 5', 'Two-minute drill only'],
     explain:
       'The ins pull linebackers inside and the corner finds the vacated space — a high-percentage red-zone combination.',
     group: 'china',
@@ -867,7 +867,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Down blocks and pulling linemen',
     distractors: [
       'Only hat-on-hat with no movement',
-      'Four verticals to clear the box',
+      'Zone steps with no designed hole',
       'A quarterback sneak every snap',
     ],
     explain:
@@ -916,7 +916,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'What does the 0-hole mean?',
     answer: 'A quarterback sneak behind center',
-    distractors: ['A toss to the left flat', 'A jet sweep', 'A fade to the X'],
+    distractors: ['A toss to the left flat', 'A jet sweep', 'The right C-gap'],
     explain: 'Hole 0 is the sneak. Even holes are right; odd holes are left.',
     group: 'holes',
   },
@@ -944,7 +944,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Whoever shows first in the A-gap',
       'The free safety every snap',
-      'The punter',
+      'The playside defensive end',
     ],
     explain:
       'Combo blocks climb, leaving one LB uncovered. The lead back knows that man before the snap — unlike lead dive, which takes the first LB in the hole.',
@@ -958,7 +958,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Same look as a pass, so the defense cannot load the box pre-snap',
     distractors: [
       'It requires two fullbacks',
-      'It is only legal in overtime',
+      'It can only be run from I formation',
       'The center must pull',
     ],
     explain:
@@ -1028,8 +1028,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     prompt: 'What is the signature block that identifies Power O?',
     answer: 'The backside guard pulling to the point of attack',
     distractors: [
-      'The center snapping and going to the flat',
-      'Both tackles releasing on wheel routes',
+      'The playside tackle pulling to the edge',
+      'Both guards double-teaming the nose with no wrap',
       'The quarterback reading the slot corner',
     ],
     explain:
@@ -1045,7 +1045,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'The free safety’s deep half',
       'Whether the slot is pressed',
-      'The play clock only',
+      'The backside guard’s first step only',
     ],
     explain:
       'If the kick-out spills the end inside, bounce. If it seals him out, run through the C-gap behind the wrap.',
@@ -1072,7 +1072,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'On duo (inside gap), who does the running back read?',
     answer: 'The Mike linebacker',
-    distractors: ['The free safety', 'The slot receiver', 'The punter'],
+    distractors: ['The free safety', 'The slot receiver', 'The backside defensive end'],
     explain:
       'Duo double-teams the defensive tackles with no puller. If Mike scrapes outside the double, run inside; if he dives inside, bang the B-gap.',
     group: 'duo',
@@ -1113,7 +1113,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'On G-lead, who becomes the lead blocker through the C-gap?',
     answer: 'The playside guard',
-    distractors: ['The free safety', 'The slot receiver', 'The punter'],
+    distractors: ['The playside tackle', 'The backside guard', 'The fullback'],
     explain:
       'The playside guard pulls and leads on the playside linebacker. The tight end must hold the end alone — no tackle help.',
     group: 'g-lead',
@@ -1124,7 +1124,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-route',
     prompt: 'T-lead is typically called from which personnel?',
     answer: '22 (two backs, two tight ends)',
-    distractors: ['00 empty', '10 four-wide', 'Dime defense'],
+    distractors: ['00 empty', '10 four-wide', '11 three-wide'],
     explain: 'The playside tackle pulls around the tight end. You want two TEs so the edge still has a body when that tackle leaves.',
     group: 't-lead',
   },
@@ -1136,8 +1136,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Pull and lead through the playside B-gap',
     distractors: [
       'Release on a wheel route',
-      'Snap the ball',
-      'Cover the slot',
+      'Down-block the 3-technique and stay',
+      'Kick out the playside end',
     ],
     explain:
       'Like Power, but the backside tackle is the traveler. Best vs a 1-technique so the playside guard can down-block with leverage.',
@@ -1151,8 +1151,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Tackle the QB or take the pitch — both are threatening the sideline',
     distractors: [
       'Cover four verticals',
-      'Block the center',
-      'Return a punt',
+      'Spy the running back in the A-gap',
+      'Drop into the flat as a buzz defender',
     ],
     explain:
       'Unlike zone read, both players are already racing outside. The QB pitches off the edge defender’s commitment.',
@@ -1198,8 +1198,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Short yardage and goal line, expecting run',
     distractors: [
       'Two-minute drill, expecting four verticals',
-      'Punt return',
-      'Opening kickoff',
+      'Third-and-long, expecting empty',
+      'First-and-10 from midfield as a base look',
     ],
     explain:
       'Third-and-1, fourth-and-1, or two yards or less. The corners are on islands — a slant or anything over 10 yards is likely complete.',
@@ -1214,7 +1214,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'It adds two safeties and removes the nose',
       'It is a four-wide offense',
-      'It is only used on kickoffs',
+      'It drops all five linemen into coverage',
     ],
     explain:
       '5 DL, 3 LB, 3 DB. The Mike can still fill vs run or drop on play-action. Every NFL team keeps 5-3 in the goal-line package.',
@@ -1254,7 +1254,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Eight in the box can account for keep, pitch, and give',
     distractors: [
       'It covers four verticals with three DBs easily',
-      'The punter rushes',
+      'It removes both linebackers for extra corners',
       'It is a man-free coverage',
     ],
     explain:
@@ -1284,7 +1284,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Occupy the center, often drawing a double team',
     distractors: [
       'Cover the slot on every snap',
-      'Return punts',
+      'Spy the quarterback on every drop',
       'Play a deep half',
     ],
     explain:
@@ -1313,7 +1313,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'The weak-side linebacker often has to cover the slot',
     distractors: [
       'There are no defensive linemen',
-      'The punter must play nickel',
+      'The free safety must cover the slot',
       'It cannot stop first-and-10 runs',
     ],
     explain:
@@ -1339,7 +1339,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'Quick three-step and bubble vs only two corners and a single safety',
     distractors: [
       'It cannot stop a sneak',
-      'It is illegal to rush more than four',
+      'The extra linebacker must cover four verticals',
       'The nose cannot line up over the center',
     ],
     explain:
@@ -1363,7 +1363,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-front',
     prompt: 'Who does the nickel corner usually cover?',
     answer: 'The slot receiver',
-    distractors: ['The left tackle', 'The punter', 'The deep middle only'],
+    distractors: ['The left tackle', 'The tight end', 'The deep middle only'],
     explain:
       'With 11 personnel, a base 4-3 leaves a linebacker on the slot. Nickel puts a faster DB there instead.',
     group: 'nickel',
@@ -1400,7 +1400,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-front',
     prompt: 'When do you typically see dime?',
     answer: 'Third-and-long (12+), two-minute, or four-plus receivers',
-    distractors: ['First-and-goal sneak', 'Kickoff only', 'Punt protection'],
+    distractors: ['First-and-goal sneak', 'Short-yardage from the 1', 'Base first-and-10'],
     explain:
       'You are saying “we know you’re throwing.” The lone linebacker covers the back or TE. Runs are open — and they also eat clock.',
     group: 'dime',
@@ -1424,7 +1424,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-coverage',
     prompt: 'When do you usually see Cover 0?',
     answer: 'Critical third-and-long when the defense needs a sack',
-    distractors: ['Victory formation', 'Opening kickoff', 'Every first-and-10'],
+    distractors: ['Short-yardage from the 1', 'First-and-10 from midfield', 'Every first-and-10'],
     explain:
       'Look for no deep safeties, press corners, and extra rushers. QB answer: hot slant or fade before the hit.',
     group: 'cover-0',
@@ -1468,7 +1468,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Plays a deep half of the field',
       'Always blitzes the A-gap',
-      'Covers the punt returner',
+      'Plays the boundary flat as a cloud corner',
     ],
     explain:
       'The robber baits the hot middle throw. Attack the sideline or look him off before throwing inside.',
@@ -1524,7 +1524,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'It is Cover 0 with no one deep',
       'Both linebackers blitz the A-gap',
-      'The nickel covers the punter',
+      'The nickel walks out to cover the slot only',
     ],
     explain:
       'Inverted coverage: safety down, corner over the top. Kills screens. The “open” Cover 3 seam is a trap until the QB confirms post-snap.',
@@ -1554,7 +1554,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Four verts only into the deep middle',
       'A sneak every snap',
-      'Punt on first down',
+      'A deep post into the dropped Mike',
     ],
     explain:
       'The deep middle is gone. Throw where the Mike left, or fake the run so he cannot get depth. Corner routes also stretch the two safeties.',
@@ -1577,7 +1577,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-coverage',
     prompt: 'Which concept is a textbook Cover 3 beater?',
     answer: 'Flood (three routes at different depths on one side)',
-    distractors: ['Lead dive', 'Punt safe', 'Victory kneel'],
+    distractors: ['Lead dive', 'Smash hitch and corner', 'Inside zone'],
     explain:
       'Cover 3 has two underneath defenders on a side and three deep. Flood puts three receivers on that side at different depths.',
     group: 'cover-3',
@@ -1618,7 +1618,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     type: 'name-coverage',
     prompt: 'What is Cover 4 (quarters) designed to stop?',
     answer: 'Explosive shots down the field',
-    distractors: ['All runs up the A-gap', 'Onside kicks', 'Punt blocks'],
+    distractors: ['All runs up the A-gap', 'Quick slants and screens', 'Option keep-and-pitch'],
     explain:
       'Four deep defenders wall off the end zone. Take the underneath completions until those DBs creep up.',
     group: 'cover-4',
@@ -1649,7 +1649,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Seven rushers with no one deep',
       'A four-man rush with no movement',
-      'A fake punt',
+      'A five-man fire zone with no dropper',
     ],
     explain:
       'If it is not more than four rushers, it is not a blitz. A dropping lineman replaces the late rusher so coverage is not empty.',
@@ -1663,8 +1663,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'A hot throw into the zone the dropping lineman just occupied',
     distractors: [
       'A sneak on third-and-20',
-      'A punt on first down',
-      'Handing off to the center',
+      'Holding the ball to wait out the rush',
+      'Checking to a dive at the extra rusher',
     ],
     explain:
       'The nickel rushes, the QB thinks that flat is empty, and the defensive end who dropped is waiting for the throw.',
@@ -1694,7 +1694,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'The Mike drops to a deep half',
       'The nickel covers the tight end',
-      'The punter rushes',
+      'The Will walks out to cover the slot',
     ],
     explain:
       'Interior A-gap is the shortest path to the QB. Second-level blitzes (Mike plug, dogs, double A) stress the OL’s ID.',
@@ -1708,8 +1708,8 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'An outside linebacker rushing, usually through a B- or C-gap',
     distractors: [
       'A coverage drop to the deep middle',
-      'A fake field goal',
-      'The center pulling',
+      'A stunt by the two interior linemen only',
+      'The Sam walking out to cover the slot',
     ],
     explain:
       'Dog = that linebacker is coming. Cross dog has the LBs exchange gaps. Double A sends both through the A-gaps.',
@@ -1750,9 +1750,9 @@ export const QUIZ_FACTS: QuizFact[] = [
     prompt: 'What does the offensive line ID first for slide protection?',
     answer: 'Which defender they are treating as the Mike',
     distractors: [
-      'The play clock only',
-      'The punter’s alignment',
-      'Whether the hash is painted',
+      'The corner’s press alignment only',
+      'The safety’s depth only',
+      'Which receiver is the X',
     ],
     explain:
       'Slide toward the ID’d Mike (zone that side, man the backside). Mis-ID the rusher and a Sam or Will comes free.',
@@ -1796,7 +1796,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'A corner, nickel, or safety rushing the edge or slot',
     distractors: [
       'Only the nose tackle twisting',
-      'A punt rush',
+      'A Mike plug through the A-gap',
       'The Mike dropping to Cover 4',
     ],
     explain:
@@ -1811,7 +1811,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'A five-man pressure with zone coverage behind it',
     distractors: [
       'A four-man rush with man coverage',
-      'A punt rush',
+      'A six-man zero blitz with no dropper',
       'Cover 0 with seven rushers',
     ],
     explain:
@@ -1826,7 +1826,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'A planned defensive-line movement to create a free rusher',
     distractors: [
       'A running-back spin move',
-      'A kickoff onside',
+      'A coverage rotation after the snap',
       'A hard count only',
     ],
     explain:
@@ -1886,7 +1886,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     answer: 'No one is deep — a completion can be a touchdown',
     distractors: [
       'Too many defenders in coverage',
-      'The punter must rush',
+      'The extra rusher must drop into the hole',
       'The offense cannot snap the ball',
     ],
     explain:
@@ -1902,7 +1902,7 @@ export const QUIZ_FACTS: QuizFact[] = [
     distractors: [
       'Take a delay of game',
       'Send the center downfield',
-      'Punt on first down',
+      'Max-protect and throw a jump ball late',
     ],
     explain:
       'Three receivers in a tight triangle create traffic for man defenders. A half-step is enough if no one is deep.',

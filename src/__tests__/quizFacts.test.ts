@@ -1,6 +1,7 @@
 import { FORMATIONS } from '@/src/data/formations';
 import { QUIZ_FACTS, factsForTopic } from '@/src/data/quizFacts';
 import { generateCards, getCardScene } from '@/src/training/cards';
+import { buildQuiz } from '@/src/training/quiz';
 import type { TrainingTopic } from '@/src/training/types';
 
 const FACT_TOPICS: TrainingTopic[] = [
@@ -279,6 +280,48 @@ describe('transcript-backed quiz facts', () => {
         if (hint) {
           expect(card.playcall).toContain(hint);
         }
+      }
+    }
+  });
+
+  it('keeps every quiz choice answering the same question', () => {
+    for (const topic of FACT_TOPICS) {
+      const cards = generateCards(topic);
+      const quiz = buildQuiz([topic], Math.min(12, cards.length), {}, {
+        seed: `choices-${topic}`,
+        cards,
+      });
+      for (const question of quiz) {
+        if (!question.card.id.startsWith('fact-')) {
+          const allowed = new Set(
+            [
+              question.card.answer,
+              ...(cards.find((card) => card.id === question.card.id)?.distractors ?? []),
+              ...(cards.find((card) => card.id === question.card.id)?.distractorPool ?? []),
+            ].map((choice) => choice.toLowerCase()),
+          );
+          for (const choice of question.choices) {
+            expect(allowed.has(choice.toLowerCase())).toBe(true);
+          }
+          continue;
+        }
+        const fact = QUIZ_FACTS.find((item) => `fact-${item.id}` === question.card.id);
+        expect(fact).toBeDefined();
+        const allowed = new Set(
+          [fact!.answer, ...fact!.distractors].map((choice) => choice.toLowerCase()),
+        );
+        for (const choice of question.choices) {
+          expect(allowed.has(choice.toLowerCase())).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('does not author joke answers that ignore the question', () => {
+    const jokes = /punter|coin toss|victory formation|victory kneel|opening kickoff|fake punt|punt on first|punt protection|punt return|punt rush|fake field goal|onside kick/i;
+    for (const fact of QUIZ_FACTS) {
+      for (const choice of fact.distractors) {
+        expect(choice).not.toMatch(jokes);
       }
     }
   });

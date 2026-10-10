@@ -57,6 +57,35 @@ describe('buildSession', () => {
     }
   });
 
+  it('uses a card’s own wrong answers instead of other topics’ answers', () => {
+    const cards: FlashCard[] = [
+      {
+        id: 'depth',
+        topic: 'passing-routes',
+        type: 'name-route',
+        prompt: 'How deep is Y cross?',
+        answer: '15 to 18 yards',
+        distractors: ['3 to 5 yards', '8 to 10 yards', '25 to 30 yards'],
+        group: 'y-cross',
+      },
+      {
+        id: 'mesh',
+        topic: 'passing-routes',
+        type: 'name-route',
+        prompt: 'Why is mesh a man beater?',
+        answer: 'Two shallow crosses create traffic',
+        distractors: ['Four verticals stretch Cover 3', 'Smash highs and lows Cover 2', 'Stick sits at 5 yards'],
+        group: 'mesh',
+      },
+    ];
+    const session = buildSession(cards, {}, { size: 2, seed: 'relevant-choices' });
+    const depth = session.find((q) => q.card.id === 'depth');
+    expect(depth?.choices.sort()).toEqual(
+      ['15 to 18 yards', '25 to 30 yards', '3 to 5 yards', '8 to 10 yards'].sort(),
+    );
+    expect(depth?.choices.join(' ')).not.toMatch(/Mesh|Cover|Ace/i);
+  });
+
   it('always finds a correctIndex', () => {
     const session = buildSession(cards, {}, { size: 10, seed: 'choices' });
     for (const q of session) {
