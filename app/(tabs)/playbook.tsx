@@ -7,7 +7,6 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
-  Platform,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import {
@@ -32,6 +31,7 @@ import {
   type UserSettings,
 } from '@/src/training';
 import { PlayPreview } from '@/src/features/playbook';
+import { encodePlayIds, selectionInOrder } from '@/src/features/playbook/playViewer';
 import {
   CollectionCreateSheet,
   COLLECTION_COLORS,
@@ -164,12 +164,33 @@ export default function PlaybookScreen() {
   };
 
   const openPlay = (id: string, scopeCollectionId?: string | null) => {
-    const col = scopeCollectionId ?? collectionFilter;
-    if (col) {
-      router.push({ pathname: '/play/[id]', params: { id, collectionId: col } });
+    if (scopeCollectionId) {
+      router.push({ pathname: '/play/[id]', params: { id, collectionId: scopeCollectionId } });
       return;
     }
-    router.push(`/play/${id}`);
+    const listIds = visible.map((p) => p.id);
+    router.push({
+      pathname: '/play/[id]',
+      params: {
+        id,
+        ids: encodePlayIds(listIds.includes(id) ? listIds : [id, ...listIds]),
+        scope: filterLabel,
+        ...(collectionFilter ? { collectionId: collectionFilter } : {}),
+      },
+    });
+  };
+
+  const viewSelected = () => {
+    const ids = selectionInOrder(visible, selectedIds);
+    if (!ids.length) return;
+    router.push({
+      pathname: '/play/[id]',
+      params: {
+        id: ids[0]!,
+        ids: encodePlayIds(ids),
+        scope: `${ids.length} selected`,
+      },
+    });
   };
 
   const makeActiveInstall = async (collectionId: string) => {
@@ -565,6 +586,11 @@ export default function PlaybookScreen() {
           <View style={styles.bulkBar}>
             <Text style={styles.bulkText}>{selectedIds.size} selected</Text>
             <Button
+              label={`View ${selectedIds.size} play${selectedIds.size === 1 ? '' : 's'}`}
+              icon="arrow"
+              onPress={viewSelected}
+            />
+            <Button
               label="Add to collection"
               variant="secondary"
               onPress={() => setBulkCollectionOpen(true)}
@@ -642,11 +668,10 @@ export default function PlaybookScreen() {
                     view === 'list' && styles.cardList,
                     selected && styles.cardSelected,
                   ]}
-                  onPress={() => openPlay(play.id)}
-                  onLongPress={() => {
-                    if (Platform.OS === 'web') toggleSelect(play.id);
-                    else setMenuPlay(play);
-                  }}
+                  onPress={() =>
+                    selectedIds.size > 0 ? toggleSelect(play.id) : openPlay(play.id)
+                  }
+                  onLongPress={() => toggleSelect(play.id)}
                 >
                   <View style={view === 'list' ? styles.listPreview : undefined}>
                     <PlayPreview

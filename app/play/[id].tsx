@@ -13,7 +13,7 @@ import {
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FieldCanvas } from '@/src/render';
-import { buildPlay, buildDefense } from '@/src/core/parser';
+import { buildPlay } from '@/src/core/parser';
 import {
   loadPlaybooks,
   markPlayViewed,
@@ -32,6 +32,12 @@ import {
   defenseAssignmentsFromScene,
 } from '@/src/features/playbook/playAssignments';
 import { findPlay } from '@/src/features/playbook/findPlay';
+import { PlaySwipePager } from '@/src/features/playbook/PlaySwipePager';
+import {
+  buildDetailScene,
+  decodePlayIds,
+  resolveViewerIds,
+} from '@/src/features/playbook/playViewer';
 import { Button, Eyebrow, Icon } from '@/src/ui';
 import { colors, typography, radius, useBreakpoint } from '@/src/design';
 
@@ -57,11 +63,20 @@ function activityLabel(row: PlayActivity): string {
 }
 
 export default function PlayDetailScreen() {
-  const { id, edit, collectionId: collectionIdParam } = useLocalSearchParams<{
+  const {
+    id,
+    edit,
+    collectionId: collectionIdParam,
+    ids: idsParam,
+    scope: scopeParam,
+  } = useLocalSearchParams<{
     id: string;
     edit?: string;
     collectionId?: string;
+    ids?: string;
+    scope?: string;
   }>();
+  const scopeLabel = typeof scopeParam === 'string' && scopeParam ? scopeParam : undefined;
   const router = useRouter();
   const { isMobile } = useBreakpoint();
   const insets = useSafeAreaInsets();
@@ -98,6 +113,16 @@ export default function PlayDetailScreen() {
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const applyPlay = useCallback((next: PlaybookPlay) => {
+    setPlay(next);
+    setName(next.name);
+    setConcept(next.concept ?? '');
+    setFormation(next.formation ?? '');
+    setPlaycall(next.playcall);
+    setNotes(next.notes ?? '');
+    setCoachingPoint(next.coachingPoint ?? '');
+  }, []);
+
   const load = useCallback(async () => {
     if (isNew || !id) return;
     const books = await loadPlaybooks();
@@ -108,16 +133,10 @@ export default function PlayDetailScreen() {
     setBookId(found.book.id);
     setCollections(found.book.collections ?? []);
     setBookPlays(found.book.plays ?? []);
-    setPlay(found.play);
-    setName(found.play.name);
-    setConcept(found.play.concept ?? '');
-    setFormation(found.play.formation ?? '');
-    setPlaycall(found.play.playcall);
-    setNotes(found.play.notes ?? '');
-    setCoachingPoint(found.play.coachingPoint ?? '');
+    applyPlay(found.play);
     setActivity(await loadPlayActivity(found.play.id));
     await markPlayViewed(found.book.id, found.play.id);
-  }, [id, isNew]);
+  }, [id, isNew, applyPlay]);
 
   useFocusEffect(
     useCallback(() => {
@@ -130,24 +149,7 @@ export default function PlayDetailScreen() {
     const call = isEditing ? playcall : play.playcall;
     if (!call.trim()) return { scene: null, error: null };
     try {
-      if (play.side === 'def') {
-        return {
-          scene: buildDefense(call, {
-            vsPlaycall: play.vsPlaycall,
-            assignments: play.assignments,
-          }),
-          error: null,
-        };
-      }
-      return {
-        scene: buildPlay(call, {
-          includeDefense: true,
-          coverageId: play.coverageId,
-          frontId: play.frontId ?? '4-3',
-          assignments: play.assignments,
-        }),
-        error: null,
-      };
+      return { scene: buildDetailScene(play, call), error: null };
     } catch (err) {
       return {
         scene: null,
@@ -179,13 +181,27 @@ export default function PlayDetailScreen() {
     [collections, collectionId],
   );
 
-  const siblingIds = useMemo(() => {
-    if (!viewingCollection) return [];
-    const present = new Set(bookPlays.map((p) => p.id));
-    return viewingCollection.playIds.filter((pid) => present.has(pid));
-  }, [viewingCollection, bookPlays]);
+  const explicitIds = useMemo(() => decodePlayIds(idsParam), [idsParam]);
 
-  const siblingIndex = play ? siblingIds.indexOf(play.id) : -1;
+  const siblingIds = useMemo(
+    () =>
+      resolveViewerIds({
+        ids: explicitIds,
+        collection: viewingCollection,
+        bookPlays,
+      }),
+    [explicitIds, viewingCollection, bookPlays],
+  );
+
+  const siblingPlays = useMemo(() => {
+    const byId = new Map(bookPlays.map((p) => [p.id, p]));
+    return siblingIds
+      .map((pid) => (pid === play?.id ? play : byId.get(pid)))
+      .filter((p): p is PlaybookPlay => !!p);
+  }, [siblingIds, bookPlays, play]);
+
+  const routeIndex = id ? siblingIds.indexOf(id) : -1;
+  const siblingIndex = routeIndex >= 0 ? routeIndex : play ? siblingIds.indexOf(play.id) : -1;
   const prevPlayId = siblingIndex > 0 ? siblingIds[siblingIndex - 1] : null;
   const nextPlayId =
     siblingIndex >= 0 && siblingIndex < siblingIds.length - 1
@@ -193,12 +209,13 @@ export default function PlayDetailScreen() {
       : null;
 
   const goToSibling = (playId: string) => {
-    if (!collectionId) return;
-    router.replace({
-      pathname: '/play/[id]',
-      params: { id: playId, collectionId },
-    });
+    if (playId === id) return;
+    const target = bookPlays.find((p) => p.id === playId);
+    if (target) applyPlay(target);
+    router.setParams({ id: playId });
   };
+
+  const crumbScope = viewingCollection?.name ?? scopeLabel;
 
   const selectedAssignment = assignments.find((a) => a.player === selected) ?? assignments[0];
 
@@ -307,9 +324,9 @@ export default function PlayDetailScreen() {
             <Text style={styles.backText}>← Playbook</Text>
           </Pressable>
           <Icon name="chevron" size={12} color="#555f58" />
-          {viewingCollection ? (
+          {crumbScope ? (
             <>
-              <Text style={styles.crumbName}>{viewingCollection.name}</Text>
+              <Text style={styles.crumbName}>{crumbScope}</Text>
               <Icon name="chevron" size={12} color="#555f58" />
             </>
           ) : null}
@@ -455,6 +472,11 @@ export default function PlayDetailScreen() {
           <View style={styles.fieldToolbar}>
             <View style={styles.modes}>
               <Text style={[styles.mode, styles.modeActive]}>Diagram</Text>
+              {!isEditing && siblingPlays.length > 1 ? (
+                <Text style={styles.mode}>
+                  {`Swipe ← → · ${siblingIndex + 1} of ${siblingPlays.length}`}
+                </Text>
+              ) : null}
             </View>
             <View style={styles.tools}>
               <Pressable onPress={() => setShowGrid((g) => !g)}>
@@ -464,7 +486,22 @@ export default function PlayDetailScreen() {
               </Pressable>
             </View>
           </View>
-          {scene ? (
+          {!isEditing && siblingPlays.length > 1 && siblingIndex >= 0 ? (
+            <PlaySwipePager
+              plays={siblingPlays}
+              index={siblingIndex}
+              onIndexChange={(i) => {
+                const next = siblingPlays[i];
+                if (next) goToSibling(next.id);
+              }}
+              height={isMobile ? 340 : 520}
+              showGrid={showGrid}
+              selectedLabel={selected}
+              onPlayerPress={(p) => {
+                if (p.label) setSelected(p.label);
+              }}
+            />
+          ) : scene ? (
             <FieldCanvas
               scene={scene}
               height={isMobile ? 340 : 520}
