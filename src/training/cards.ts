@@ -110,11 +110,13 @@ function tryBuildPlay(playcall: string, includeDefense = false): PlayScene | und
   }
 }
 
-function tryBuildDefense(playcall: string, stripArrows = false): PlayScene | undefined {
+function tryBuildDefense(
+  playcall: string,
+  stripArrows = false,
+  vsPlaycall = 'Gun Doubles Right 62 Slant-Flat',
+): PlayScene | undefined {
   try {
-    const scene = buildDefense(playcall, {
-      vsPlaycall: 'Gun Doubles Right 62 Slant-Flat',
-    });
+    const scene = buildDefense(playcall, { vsPlaycall });
     return {
       ...scene,
       title: '',
@@ -123,6 +125,24 @@ function tryBuildDefense(playcall: string, stripArrows = false): PlayScene | und
   } catch {
     return undefined;
   }
+}
+
+/** Build the diagram shown on playbook identify-the-play cards. */
+function sceneForPlaybookPlay(play: Pick<PlaybookPlay, 'playcall' | 'side' | 'vsPlaycall'>): PlayScene | undefined {
+  if (play.side === 'def') {
+    return tryBuildDefense(
+      play.playcall,
+      false,
+      play.vsPlaycall ?? 'Gun Doubles Right 62 Slant-Flat',
+    );
+  }
+  return tryBuildPlay(play.playcall, false);
+}
+
+function offensePlaysForPlayCalls(
+  plays: { playcall: string; side?: PlaybookPlay['side'] }[],
+): typeof plays {
+  return plays.filter((p) => p.side !== 'def');
 }
 
 function sceneForRunName(runName: string): { playcall: string; scene: PlayScene } {
@@ -552,7 +572,8 @@ function playcallCards(ctx?: CardContext): FlashCard[] {
     { id: 'sample-dagger', name: 'Dagger', playcall: 'Gun Doubles Right 62 Dagger' },
     { id: 'sample-wz', name: 'Wide Zone Rt', playcall: 'Gun Doubles Right Wide Zone' },
   ];
-  const plays = ctx?.plays?.length ? ctx.plays : fallback;
+  const raw = ctx?.plays?.length ? ctx.plays : fallback;
+  const plays = offensePlaysForPlayCalls(raw);
   return [...cardsFromPlaybook(plays), ...factCards('play-calls')];
 }
 
@@ -1206,6 +1227,14 @@ export function getCardScene(card: FlashCard) {
         } else {
           scene = built;
         }
+      } else if (card.topic === 'play-calls' && card.type === 'match-playcall') {
+        scene =
+          tryBuildPlay(card.playcall, false) ??
+          tryBuildDefense(
+            card.playcall,
+            false,
+            card.resolveOptions?.vsPlaycall ?? 'Gun Doubles Right 62 Slant-Flat',
+          );
       } else {
         scene = buildPlay(card.playcall, {
           includeDefense: card.resolveOptions?.includeDefense ?? false,
@@ -1225,21 +1254,33 @@ export function getCardScene(card: FlashCard) {
  * Diagram → display name (answer is the teaching name, not the raw call).
  */
 export function cardsFromPlaybook(
-  plays: { id: string; name: string; playcall: string; concept?: string; coachingPoint?: string }[],
+  plays: Pick<
+    PlaybookPlay,
+    'id' | 'name' | 'playcall' | 'concept' | 'coachingPoint' | 'side' | 'vsPlaycall'
+  >[],
 ): FlashCard[] {
-  if (plays.length === 0) return [];
-  const names = plays.map((p) => p.name);
-  return plays.map((p) => ({
-    id: `playbook-${p.id}`,
-    topic: 'play-calls' as const,
-    type: 'match-playcall' as const,
-    prompt: 'Name this play',
-    answer: p.name,
-    distractors: pickDistractors(p.name, names),
-    distractorPool: names,
-    playcall: p.playcall,
-    explain: p.coachingPoint ?? (p.concept ? `${p.name} — ${p.concept} family.` : undefined),
-    group: p.concept ?? p.id,
-    hideTitle: true,
-  }));
+  const offense = offensePlaysForPlayCalls(plays);
+  if (offense.length === 0) return [];
+  const names = offense.map((p) => p.name);
+  return offense.map((p) => {
+    const built = sceneForPlaybookPlay(p);
+    return {
+      id: `playbook-${p.id}`,
+      topic: 'play-calls' as const,
+      type: 'match-playcall' as const,
+      prompt: 'Name this play',
+      answer: p.name,
+      distractors: pickDistractors(p.name, names),
+      distractorPool: names,
+      playcall: p.playcall,
+      scene: built,
+      explain: p.coachingPoint ?? (p.concept ? `${p.name} — ${p.concept} family.` : undefined),
+      group: p.concept ?? p.id,
+      hideTitle: true,
+      resolveOptions: {
+        includeDefense: false,
+        vsPlaycall: p.vsPlaycall,
+      },
+    };
+  });
 }
