@@ -45,34 +45,42 @@ export function PlayBuilder({
     return () => window.removeEventListener('keydown', onKey);
   }, [onSave]);
 
+  const actionButtons = (
+    <View style={styles.actions}>
+      <Button
+        label={builder.routesVisible ? 'Hide routes' : 'Show routes'}
+        icon="grid"
+        variant="secondary"
+        onPress={() => builder.setRoutesVisible(!builder.routesVisible)}
+      />
+      <Button
+        label={builder.saved ? 'Saved' : 'Save play'}
+        icon={builder.saved ? 'spark' : 'arrow'}
+        variant={builder.saved ? 'saved' : 'primary'}
+        onPress={onSave}
+      />
+    </View>
+  );
+
   return (
-    <View style={styles.panel}>
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <View style={styles.labelRow}>
-            <View style={styles.liveDot} />
-            <Text style={styles.label}>PLAY BUILDER</Text>
+    <View style={[styles.panel, isMobile && styles.panelMobile]}>
+      {isDesktop ? (
+        <View style={styles.header}>
+          <View style={{ flex: 1 }}>
+            <View style={styles.labelRow}>
+              <View style={styles.liveDot} />
+              <Text style={styles.label}>PLAY BUILDER</Text>
+            </View>
+            <Text style={styles.h2}>Design the call.</Text>
+            <Text style={styles.sub}>
+              Type a playcall or build it from the controls — chart and name stay in sync.
+            </Text>
           </View>
-          <Text style={styles.h2}>Design the call.</Text>
-          <Text style={styles.sub}>
-            Type a playcall or build it from the controls — chart and name stay in sync.
-          </Text>
+          {actionButtons}
         </View>
-        <View style={styles.actions}>
-          <Button
-            label={builder.routesVisible ? 'Hide routes' : 'Show routes'}
-            icon="grid"
-            variant="secondary"
-            onPress={() => builder.setRoutesVisible(!builder.routesVisible)}
-          />
-          <Button
-            label={builder.saved ? 'Saved' : 'Save play'}
-            icon={builder.saved ? 'spark' : 'arrow'}
-            variant={builder.saved ? 'saved' : 'primary'}
-            onPress={onSave}
-          />
-        </View>
-      </View>
+      ) : (
+        <View style={styles.toolbar}>{actionButtons}</View>
+      )}
 
       {saveError ? <Text style={styles.saveError}>{saveError}</Text> : null}
       {savedPlayId && builder.saved ? (
@@ -151,6 +159,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingBottom: 22,
     backgroundColor: colors.bg,
+  },
+  panelMobile: {
+    paddingTop: 12,
+    paddingHorizontal: 16,
+  },
+  toolbar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 10,
   },
   header: {
     flexDirection: 'row',

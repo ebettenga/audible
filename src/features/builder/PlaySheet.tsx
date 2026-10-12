@@ -214,7 +214,7 @@ export function PlaySheet({
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingTop: 36,
+    paddingTop: 24,
     paddingHorizontal: 28,
     paddingBottom: 28,
   },

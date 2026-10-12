@@ -256,9 +256,9 @@ export default function BuildScreen() {
   if (isMobile) {
     return (
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 28 }}>
-        {sheet}
-        <View style={styles.mobileDivider} />
         {workspace}
+        <View style={styles.mobileDivider} />
+        {sheet}
       </ScrollView>
     );
   }
