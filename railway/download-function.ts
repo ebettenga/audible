@@ -1,7 +1,7 @@
 const APK_URL =
-  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=262454e";
+  "https://raw.githubusercontent.com/ebettenga/audible/main/releases/audible-1.0.0.apk?v=1.0.8-build";
 const FILENAME = "audible-1.0.0.apk";
-const BUILD_LABEL = "1.0.7 (main @ 262454e)";
+const BUILD_LABEL = "1.0.8 (main @ d12f86c + ship)";
 
 const PAGE = `<!doctype html>
 <html>
@@ -20,7 +20,7 @@ const PAGE = `<!doctype html>
 <body>
   <main>
     <h1>Audible</h1>
-    <p>Build <code>${BUILD_LABEL}</code>: assignment drawer stays closed until you tap a player; centered route preview with correct mirroring; Build tab crash fix; sheet above Android nav bar. Uninstall the old APK first if Android says the app is already installed. Tap download, wait until complete, then open the APK.</p>
+    <p>Build <code>${BUILD_LABEL}</code>: Build tab shows the field viewer and call controls first; play name, notes, and playbook live below. versionCode 8 — you can install over 1.0.7. If Android blocks the update, uninstall the old APK first. Tap download, wait until complete, then open the APK.</p>
     <a href="/audible-1.0.0.apk">Download APK</a>
   </main>
 </body>
