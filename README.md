@@ -66,3 +66,7 @@ Examples:
 1. **Train** — topic tiles (personnel, formations, play calls, routes, zones, coverages, field positions)
 2. **Playground** — live playcall → diagram with defense/coverage toggles
 3. **Playbook** — collections/installs, real FieldCanvas previews, sort/filter, play detail with notes/activity
+
+## Future expansion (wish list)
+
+Product ideas for later phases are captured in [plans/expansion-wishlist.md](./plans/expansion-wishlist.md), centered on two questions: can players execute each play, and is each play working in its intended contexts?
